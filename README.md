@@ -23,7 +23,7 @@ Hosted seamlessly on **GitHub Pages** with zero backend infrastructure required.
 - **`#` Mention Autocomplete:** Type `#` anywhere in the chat box to instantly search and tag any Belgian university for focused research.
 - **Official Legal Proof & Citations:** Cites official Belgian decrees, ARES circulars, Codex Hoger Onderwijs, and Office des Étrangers Article 60 regulations.
 - **General Belgian Visa & Embassy Guidance:** Answers questions on Blocked Accounts, Annex 32 legal guarantors, Gerry's visa submissions, and post-study Search Year rights.
-- **Pre-Configured with Groq Key:** Ready to use with high-speed models (`openai/gpt-oss-120b`, fallback to `openai/gpt-oss-20b` or `qwen/qwen3.8-27b`). Custom key input available in ⚙️ Settings.
+- **BYOK (Bring Your Own Key):** Fast reasoning models supported (`openai/gpt-oss-120b`, fallback to `openai/gpt-oss-20b` or `qwen/qwen3.8-27b`). Enter your free key via ⚙️ Settings (stored locally in browser localStorage only, never exposed or sent to third parties).
 
 ### 3. 📑 Dedicated Full University Deep-Dive Pages
 - Every university has a dedicated full page (`#/program/:id`) featuring:

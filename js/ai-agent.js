@@ -5,7 +5,7 @@
 
 import { UNIVERSITIES, BELGIUM_DOMAINS, SAMPLE_QUESTIONS } from './data.js';
 
-const DEFAULT_GROQ_KEY = "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";
+const DEFAULT_GROQ_KEY = "";
 const PRIMARY_MODEL = "openai/gpt-oss-120b";
 const FALLBACK_MODELS = ["openai/gpt-oss-20b", "qwen/qwen3.8-27b"];
 
@@ -130,8 +130,8 @@ export class BelgiumAiAgent {
           <div class="ai-settings-body">
             <label>
               <strong>Groq API Key</strong>
-              <input type="password" id="aiApiKeyInput" value="${this.apiKey}" placeholder="gsk_..." />
-              <small>Your key is stored locally in your browser only.</small>
+              <input type="password" id="aiApiKeyInput" value="${this.apiKey || ''}" placeholder="gsk_..." />
+              <small>Stored locally in your browser only. Get a free key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--pr);">console.groq.com</a>.</small>
             </label>
             <label style="margin-top: 12px;">
               <strong>Model</strong>
@@ -143,7 +143,7 @@ export class BelgiumAiAgent {
             </label>
           </div>
           <div class="ai-settings-footer">
-            <button class="btn" id="aiResetKey">Reset to Default</button>
+            <button class="btn" id="aiResetKey">Clear Key</button>
             <button class="btn p" id="aiSaveSettings">Save Changes</button>
           </div>
         </div>
@@ -178,9 +178,11 @@ export class BelgiumAiAgent {
     document.getElementById("aiSaveSettings").addEventListener("click", () => {
       const newKey = document.getElementById("aiApiKeyInput").value.trim();
       const newModel = document.getElementById("aiModelSelect").value;
+      this.apiKey = newKey;
       if (newKey) {
-        this.apiKey = newKey;
         localStorage.setItem("bmp_groq_key", newKey);
+      } else {
+        localStorage.removeItem("bmp_groq_key");
       }
       this.model = newModel;
       localStorage.setItem("bmp_groq_model", newModel);
@@ -188,7 +190,9 @@ export class BelgiumAiAgent {
       document.getElementById("aiSettingsModal").classList.add("hidden");
     });
     document.getElementById("aiResetKey").addEventListener("click", () => {
-      document.getElementById("aiApiKeyInput").value = DEFAULT_GROQ_KEY;
+      document.getElementById("aiApiKeyInput").value = "";
+      this.apiKey = "";
+      localStorage.removeItem("bmp_groq_key");
       document.getElementById("aiModelSelect").value = PRIMARY_MODEL;
     });
 
@@ -518,6 +522,10 @@ RESPONSE GUIDELINES:
   }
 
   async queryGroq(userQuery) {
+    if (!this.apiKey) {
+      throw new Error("No Groq API key configured. Click ⚙️ Settings (top-right of this chat) and enter your free API key from https://console.groq.com/keys.");
+    }
+
     const systemPrompt = this.buildSystemPrompt();
 
     // Contextual message history
