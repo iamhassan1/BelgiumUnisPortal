@@ -900,69 +900,564 @@ export class PortalViews {
     const container = document.getElementById("v-guide");
     if (!container) return;
 
-    container.innerHTML = `
-      <div class="two-col-layout">
-        <!-- Step by Step Roadmap -->
-        <div class="box">
-          <h3>Roadmap to Belgium (September 2027 Intake)</h3>
-          <p class="mu">Chronological checklist from university shortlisting to Belgian commune registration.</p>
+    // Load saved checklist state
+    let savedChecks = {};
+    try {
+      savedChecks = JSON.parse(localStorage.getItem("bmp_doc_checklist") || "{}");
+    } catch (e) {
+      savedChecks = {};
+    }
 
-          <div class="roadmap-timeline" style="margin-top: 14px;">
-            ${BELGIUM_DOMAINS.visaProcess.steps.map(s => `
-              <div class="roadmap-step">
-                <div class="step-num">${s.step}</div>
-                <div class="step-text">
-                  <strong>${s.title}</strong>
-                  <p>${s.desc}</p>
+    const checklistItems = [
+      { id: "passport", col: "academic", title: "Valid International Passport", note: "At least 18 months validity remaining + 2 blank pages." },
+      { id: "degree_transcript", col: "academic", title: "Bachelor Degree & Transcripts", note: "Originals verified by HEC and MOFA with Apostille stamp." },
+      { id: "ielts", col: "academic", title: "IELTS Academic Certificate", note: "Minimum 6.5 overall (minimum 6.0 in each sub-band)." },
+      { id: "syllabi", col: "academic", title: "Course Syllabi PDF Booklet", note: "Detailed breakdown of completed modules (topics, textbooks, credit hours)." },
+      { id: "cv_motivation", col: "academic", title: "Europass CV & Motivation Letters", note: "Tailored statement of purpose for each applied university." },
+      { id: "recommendations", col: "academic", title: "2 Recommendation Letters", note: "Signed references from university professors or tech employers." },
+      { id: "admission_offer", col: "visa", title: "Official University Offer Letter", note: "Unconditional or conditional admission letter from Belgian institution." },
+      { id: "solvency_proof", col: "visa", title: "Proof of Financial Solvency", note: "University Blocked Account attestation or signed Annex 32 guarantee." },
+      { id: "medical_cert", col: "visa", title: "Embassy Panel Doctor Medical", note: "Fit-to-travel certificate from Belgian Embassy-approved panel clinic." },
+      { id: "police_cert", col: "visa", title: "Police Character Certificate", note: "Clean criminal record certificate issued within 6 months, MOFA attested." },
+      { id: "admin_fee", col: "visa", title: "Federal Admin Fee Receipt", note: "Bank Swift proof of ~€250 paid to Belgian Immigration Office." },
+      { id: "visa_form", col: "visa", title: "Visa D Application Form & Photos", note: "Completed Long-Stay Visa D form with 2 Schengen biometric photos." }
+    ];
+
+    const completedCount = checklistItems.filter(item => savedChecks[item.id]).length;
+    const progressPct = Math.round((completedCount / checklistItems.length) * 100);
+
+    const phases = [
+      {
+        num: "01",
+        title: "University Admission",
+        time: "Oct – Mar",
+        actions: [
+          "Apply to 3–4 programs across Flanders and Wallonia portals.",
+          "Submit academic transcripts, CV, and English test (IELTS 6.5+).",
+          "Receive your official admission offer letter."
+        ],
+        tip: "Apply to at least one Wallonia university (UCLouvain or ULiège) to lock in low EU rates under €1,200/yr."
+      },
+      {
+        num: "02",
+        title: "Attestation & Blocked Account",
+        time: "Mar – Jun",
+        actions: [
+          "Attest Bachelor degree & transcripts via HEC and MOFA Apostille.",
+          "Transfer ~€9,636 into university blocked account escrow.",
+          "University issues your formal Solvency Attestation."
+        ],
+        tip: "University Blocked Account has a 99%+ visa approval rate because the money is already secured in Belgium in your name."
+      },
+      {
+        num: "03",
+        title: "Embassy Visa D Dossier",
+        time: "Jun – Aug",
+        actions: [
+          "Medical checkup with an official embassy-designated panel clinic.",
+          "Obtain Police Character Certificate (<6 months old, MOFA attested).",
+          "Pay federal administrative fee (~€250) to Belgian Immigration.",
+          "Submit physical dossier & biometric fingerprints at VFS / Gerry's."
+        ],
+        tip: "Do not get your police certificate too early—it must be under 6 months old when submitted to the visa center!"
+      },
+      {
+        num: "04",
+        title: "Landing & Belgian ID (Card A)",
+        time: "Sept – Oct",
+        actions: [
+          "Book student room ('kot') and fly into Brussels Airport.",
+          "Register at local town hall (Commune) within 8 days of landing.",
+          "Open Belgian bank account to receive €803 payout every month.",
+          "Local police confirms address; pick up your Biometric Residence Card A."
+        ],
+        tip: "Your Card A legally allows you to work 20 hrs/week during classes and full-time 38 hrs/week during summer!"
+      }
+    ];
+
+    container.innerHTML = `
+      <div class="guide-container">
+        <!-- Hero Section with Quick Metric Highlights -->
+        <div class="guide-hero">
+          <span class="guide-hero-badge">🇧🇪 Belgian Student Visa D Blueprint (2026 / 2027)</span>
+          <h2>Belgium Student Visa &amp; Journey Made Simple</h2>
+          <p class="guide-hero-desc">Zero confusion, zero legal jargon. Here is exactly what happens, how much it costs, and when to take action for your Master's journey.</p>
+
+          <div class="guide-hero-stats-grid">
+            <div class="guide-stat-card">
+              <span class="guide-stat-label">💶 Living Proof</span>
+              <span class="guide-stat-value">€803 / mo</span>
+              <span class="guide-stat-sub">100% returned to you in Belgium</span>
+            </div>
+
+            <div class="guide-stat-card">
+              <span class="guide-stat-label">⚡ Visa Processing</span>
+              <span class="guide-stat-value">3 to 5 Wks</span>
+              <span class="guide-stat-sub">Average turnaround via Embassy / VFS</span>
+            </div>
+
+            <div class="guide-stat-card">
+              <span class="guide-stat-label">💼 Search Year</span>
+              <span class="guide-stat-value">12 Months</span>
+              <span class="guide-stat-sub">Post-grad work permit (Zoekjaar)</span>
+            </div>
+
+            <div class="guide-stat-card">
+              <span class="guide-stat-label">🏛️ Wallonia Fee</span>
+              <span class="guide-stat-value">€835 – €1,194</span>
+              <span class="guide-stat-sub">Standard EU rate for DAC nationals</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-Tabs Navigation Bar -->
+        <div class="guide-tabs-bar" id="guideTabsBar">
+          <button class="guide-tab-btn active" data-tab="roadmap">🗺️ 4-Stage Roadmap</button>
+          <button class="guide-tab-btn" data-tab="solvency">💳 Solvency &amp; Money Flow</button>
+          <button class="guide-tab-btn" data-tab="checklist">📋 Document Checklist</button>
+          <button class="guide-tab-btn" data-tab="budget">💰 True Cost Breakdown</button>
+          <button class="guide-tab-btn" data-tab="faqs">❓ Quick-Answer FAQs</button>
+        </div>
+
+        <!-- TAB 1: 4-Stage Roadmap -->
+        <div class="guide-panel active" id="tab-roadmap">
+          <div class="roadmap-phases-grid">
+            ${phases.map(p => `
+              <div class="roadmap-phase-card">
+                <div class="roadmap-phase-header">
+                  <div class="roadmap-phase-tag-wrap">
+                    <span class="roadmap-phase-num">${p.num}</span>
+                    <span class="roadmap-phase-title">${p.title}</span>
+                  </div>
+                  <span class="roadmap-phase-time">🗓️ ${p.time}</span>
+                </div>
+
+                <ul class="roadmap-action-list">
+                  ${p.actions.map(act => `
+                    <li class="roadmap-action-item">
+                      <span class="roadmap-action-icon">✓</span>
+                      <span>${act}</span>
+                    </li>
+                  `).join("")}
+                </ul>
+
+                <div class="roadmap-phase-tip">
+                  <b>💡 Beginner Rule:</b>
+                  <span>${p.tip}</span>
                 </div>
               </div>
             `).join("")}
           </div>
         </div>
 
-        <!-- Solvency, Annex 32 & FAQs -->
-        <div>
-          <!-- Solvency explanation box -->
-          <div class="box" style="margin-bottom: 14px;">
-            <h3>Proof of Solvency: Blocked Account vs Annex 32</h3>
-            <p class="mu">Article 60 statutory living proof requirement (€803/month for 2025/2026/2027).</p>
+        <!-- TAB 2: Solvency & Money Flow -->
+        <div class="guide-panel" id="tab-solvency">
+          <div class="solvency-box">
+            <div class="solvency-header">
+              <h3>How the University Blocked Account Works</h3>
+              <p>Under Article 60 of the Belgian Aliens Act, students must demonstrate €803/month for living expenses. You are NOT paying a fee—you are simply placing your living money into escrow in your own name.</p>
+            </div>
 
-            <div class="solvency-cards-grid" style="margin-top: 10px;">
-              ${BELGIUM_DOMAINS.blockedAccount.routes.map(r => `
-                <div class="solvency-mini-card">
-                  <strong>${r.name}</strong>
-                  <p>${r.details}</p>
-                </div>
-              `).join("")}
+            <!-- 4-Step Sequential Funds Flow -->
+            <div class="flow-diagram-grid">
+              <div class="flow-node">
+                <span class="flow-node-step">Stage 1</span>
+                <span class="flow-node-title">Deposit Living Funds</span>
+                <span class="flow-node-desc">Transfer ~€9,636 to your Belgian university's official escrow bank account.</span>
+              </div>
+
+              <div class="flow-node">
+                <span class="flow-node-step">Stage 2</span>
+                <span class="flow-node-title">Solvency Certificate</span>
+                <span class="flow-node-desc">University immediately issues your formal "Attestation of Solvency" for the embassy.</span>
+              </div>
+
+              <div class="flow-node">
+                <span class="flow-node-step">Stage 3</span>
+                <span class="flow-node-title">Visa D Issued</span>
+                <span class="flow-node-desc">Embassy grants your Long-Stay Visa D. You book your flight and land in Belgium.</span>
+              </div>
+
+              <div class="flow-node">
+                <span class="flow-node-step">Stage 4</span>
+                <span class="flow-node-title">Monthly Payback</span>
+                <span class="flow-node-desc">Open a free Belgian bank account. University transfers €803 back to you every month!</span>
+              </div>
+            </div>
+
+            <!-- Comparison Matrix Table -->
+            <div style="margin-top: 24px;">
+              <h4 style="font-size: 16px; font-weight: 800; color: var(--tx); margin-bottom: 6px;">Which Solvency Route Should You Choose?</h4>
+              <p style="font-size: 13px; color: var(--tx-muted); margin-bottom: 12px;">Compare the 3 legal methods recognized by Belgian embassies worldwide:</p>
+
+              <div style="overflow-x: auto;">
+                <table class="comparison-matrix-table">
+                  <thead>
+                    <tr>
+                      <th>Solvency Route</th>
+                      <th>Upfront Cash</th>
+                      <th>Is Money Returned?</th>
+                      <th>Approval Rate</th>
+                      <th>Who It's Best For</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="highlight-row">
+                      <td><b>⭐ University Blocked Account</b></td>
+                      <td>~€9,636 – €10,200</td>
+                      <td><span class="badge g">Yes, €803/month</span></td>
+                      <td><span class="badge g">99%+ (Safest)</span></td>
+                      <td>Self-funded students (zero sponsor hassle)</td>
+                    </tr>
+                    <tr>
+                      <td><b>Annex 32 Legal Guarantor</b></td>
+                      <td>€0 from student</td>
+                      <td>N/A (Sponsor covers you)</td>
+                      <td><span class="badge b">~75%–85%</span></td>
+                      <td>Students with high-earning EU/Belgian family</td>
+                    </tr>
+                    <tr>
+                      <td><b>Official Scholarship (Master Mind / EMJM)</b></td>
+                      <td>€0 from student</td>
+                      <td><span class="badge p">Monthly stipend</span></td>
+                      <td><span class="badge g">99%+ (Guaranteed)</span></td>
+                      <td>High CGPA candidates (3.5+ CGPA)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
+        </div>
 
-          <!-- Search Year & Work Rights -->
-          <div class="box" style="margin-bottom: 14px;">
-            <h3>Post-Study Work Visa (Zoekjaar)</h3>
-            <p>${BELGIUM_DOMAINS.searchYear.summary}</p>
-            <p style="margin-top: 6px;"><b>Working while studying:</b> ${BELGIUM_DOMAINS.workRights.summary}</p>
+        <!-- TAB 3: Interactive Checklist -->
+        <div class="guide-panel" id="tab-checklist">
+          <div class="checklist-card">
+            <div class="checklist-top-bar">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--tx); margin-bottom: 4px;">Visa &amp; Admission Document Checklist</h3>
+                <p id="checklistProgressText" style="font-size: 13px; color: var(--tx-muted);">${completedCount} of ${checklistItems.length} documents ready (${progressPct}%)</p>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <div class="checklist-filters">
+                  <button class="checklist-filter-btn active" data-filter="all">All (12)</button>
+                  <button class="checklist-filter-btn" data-filter="academic">Academic (6)</button>
+                  <button class="checklist-filter-btn" data-filter="visa">Embassy (6)</button>
+                </div>
+                <button class="btn s" id="checklistCopyBtn" title="Copy full checklist to clipboard">📋 Copy List</button>
+                <button class="btn s" id="checklistResetBtn" title="Reset all checked items">↺ Reset</button>
+              </div>
+            </div>
+
+            <div class="checklist-progress-bar-wrap">
+              <div class="checklist-progress-fill" id="checklistProgressFill" style="width: ${progressPct}%;"></div>
+            </div>
+
+            <div class="checklist-groups-grid">
+              <!-- Academic & Identity -->
+              <div class="checklist-group" data-col="academic">
+                <div class="checklist-group-title">
+                  <span>🎓</span>
+                  <span>Academic &amp; Identification Dossier</span>
+                </div>
+                ${checklistItems.filter(i => i.col === "academic").map(item => `
+                  <div class="checklist-item-row ${savedChecks[item.id] ? "checked" : ""}" data-id="${item.id}" data-category="academic">
+                    <input type="checkbox" class="checklist-checkbox" ${savedChecks[item.id] ? "checked" : ""} />
+                    <div class="checklist-item-info">
+                      <span class="checklist-item-label">${item.title}</span>
+                      <span class="checklist-item-note">${item.note}</span>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+
+              <!-- Visa & Legal -->
+              <div class="checklist-group" data-col="visa">
+                <div class="checklist-group-title">
+                  <span>🏛️</span>
+                  <span>Belgian Embassy &amp; Legal Dossier</span>
+                </div>
+                ${checklistItems.filter(i => i.col === "visa").map(item => `
+                  <div class="checklist-item-row ${savedChecks[item.id] ? "checked" : ""}" data-id="${item.id}" data-category="visa">
+                    <input type="checkbox" class="checklist-checkbox" ${savedChecks[item.id] ? "checked" : ""} />
+                    <div class="checklist-item-info">
+                      <span class="checklist-item-label">${item.title}</span>
+                      <span class="checklist-item-note">${item.note}</span>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
           </div>
+        </div>
 
-          <!-- Document checklist -->
-          <div class="box">
-            <h3>Document Preparation Checklist</h3>
-            <ul class="clean-bullet-list" style="margin-top: 8px;">
-              <li>Valid International Passport (valid at least 18 months).</li>
-              <li>Bachelor Degree &amp; Transcript, HEC attested + MOFA Apostille stamp.</li>
-              <li>IELTS Academic certificate (minimum 6.5 overall).</li>
-              <li>Comprehensive Course Syllabi (detailed module descriptions PDF).</li>
-              <li>Europass CV + Tailored Motivation Letter per university.</li>
-              <li>2 Academic or Employer Recommendation Letters.</li>
-              <li>Game Portfolio / GitHub code repository (for graphics &amp; game tracks).</li>
-              <li>Police Clearance Certificate (issued within 6 months, MOFA attested).</li>
-              <li>Medical Certificate from Belgian Embassy approved panel physician.</li>
-              <li>Proof of Financial Solvency (Blocked Account / Annex 32 / Scholarship).</li>
-            </ul>
+        <!-- TAB 4: True Cost Breakdown -->
+        <div class="guide-panel" id="tab-budget">
+          <div class="budget-card">
+            <div>
+              <h3 style="font-size: 19px; font-weight: 800; color: var(--tx); margin-bottom: 4px;">Itemized Belgian Study &amp; Visa Budget</h3>
+              <p style="font-size: 13px; color: var(--tx-muted);">Clear, realistic itemized breakdown of every expense from home country to your first month in Belgium:</p>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="budget-table">
+                <thead>
+                  <tr>
+                    <th>Expense Item</th>
+                    <th>Payable To</th>
+                    <th>Estimated Amount</th>
+                    <th>Refundable / Returned?</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>Blocked Living Escrow Account</b></td>
+                    <td>Belgian University</td>
+                    <td><b>€9,636</b></td>
+                    <td><span class="badge g">100% Returned (€803/mo)</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>University Tuition (Wallonia DAC rate)</b></td>
+                    <td>UCLouvain / ULiège</td>
+                    <td><b>~€835</b></td>
+                    <td>Standard annual tuition fee</td>
+                  </tr>
+                  <tr>
+                    <td><b>Federal Administrative Contribution</b></td>
+                    <td>Office des Étrangers (Immigration)</td>
+                    <td><b>~€250</b></td>
+                    <td>Non-refundable state fee</td>
+                  </tr>
+                  <tr>
+                    <td><b>Visa Application &amp; Biometrics</b></td>
+                    <td>VFS / Gerry's Visa Center</td>
+                    <td><b>~€85</b></td>
+                    <td>Non-refundable processing</td>
+                  </tr>
+                  <tr>
+                    <td><b>Embassy Panel Medical Examination</b></td>
+                    <td>Embassy Panel Clinic</td>
+                    <td><b>~€90</b></td>
+                    <td>Direct clinic fee</td>
+                  </tr>
+                  <tr>
+                    <td><b>HEC Verification &amp; MOFA Apostille</b></td>
+                    <td>Government Offices</td>
+                    <td><b>~€30</b></td>
+                    <td>Stamp and attestation fees</td>
+                  </tr>
+                  <tr>
+                    <td><b>Police Character Clearance</b></td>
+                    <td>Police Facilitation Center</td>
+                    <td><b>~€15</b></td>
+                    <td>Certificate processing</td>
+                  </tr>
+                  <tr class="budget-total-row">
+                    <td><b>Total Upfront Cash Required</b></td>
+                    <td>All Combined</td>
+                    <td><b>~€10,941</b></td>
+                    <td><span style="color: var(--primary-text); font-weight: 800;">(€9,636 is paid back to you!)</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="background: var(--bg-subtle); border-radius: var(--radius-lg); padding: 14px 18px; font-size: 12.5px; color: var(--tx-muted); line-height: 1.55;">
+              💡 <b>Bottom Line:</b> Your net non-refundable expenditure to reach Belgium is only <b>~€1,305</b> (tuition + government fees). The largest portion (€9,636) is your own living budget deposited into your own Belgian account.
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: Quick-Answer Accordion FAQs -->
+        <div class="guide-panel" id="tab-faqs">
+          <div class="faq-accordion-list">
+            <div class="faq-accordion-item open">
+              <div class="faq-accordion-header">
+                <span class="faq-accordion-question">❓ Is the Blocked Account a fee or my own money?</span>
+                <span class="faq-accordion-icon">▼</span>
+              </div>
+              <div class="faq-accordion-body">
+                <b>It is 100% your money!</b> Under Belgian immigration law (Article 60), the university acts as a secure escrow agent. Once you arrive in Belgium and open a free local bank account, the university transfers <b>€803 directly into your personal account every single month</b> to pay for your rent and food.
+              </div>
+            </div>
+
+            <div class="faq-accordion-item">
+              <div class="faq-accordion-header">
+                <span class="faq-accordion-question">❓ Can I apply for admission before taking the IELTS?</span>
+                <span class="faq-accordion-icon">▼</span>
+              </div>
+              <div class="faq-accordion-body">
+                <b>Yes.</b> Major Belgian institutions (notably UCLouvain, ULiège, and VUB) regularly accept applications with proof of an upcoming test registration, granting a conditional offer. Your official test result (6.5+ overall) is required before final visa enrollment.
+              </div>
+            </div>
+
+            <div class="faq-accordion-item">
+              <div class="faq-accordion-header">
+                <span class="faq-accordion-question">❓ Why is Wallonia tuition so low (~€835/yr) for developing nations?</span>
+                <span class="faq-accordion-icon">▼</span>
+              </div>
+              <div class="faq-accordion-body">
+                Under the Wallonia-Brussels Higher Education Decree, non-EU students who are nationals of developing countries included in the DAC/OECD list are legally assimilated to EU status. This exempts you from the standard €4,175+ international surtax, so you pay only the standard EU fee of <b>~€835 to €1,194 per year</b>.
+              </div>
+            </div>
+
+            <div class="faq-accordion-item">
+              <div class="faq-accordion-header">
+                <span class="faq-accordion-question">❓ Can I work part-time while studying in Belgium?</span>
+                <span class="faq-accordion-icon">▼</span>
+              </div>
+              <div class="faq-accordion-body">
+                <b>Yes!</b> Non-EU students holding a valid Belgian residence card A are legally entitled to work up to <b>20 hours per week</b> during academic semesters and <b>full-time (38 hrs/week) during official holidays</b> (July &amp; August) without needing any separate work permit. Average pay ranges between €12 and €16/hour.
+              </div>
+            </div>
+
+            <div class="faq-accordion-item">
+              <div class="faq-accordion-header">
+                <span class="faq-accordion-question">❓ What is a "Kot" and how much does student rent cost?</span>
+                <span class="faq-accordion-icon">▼</span>
+              </div>
+              <div class="faq-accordion-body">
+                In Belgium, a "kot" is a private furnished student bedroom in a shared student house with communal kitchen and bathroom facilities. Monthly rent averages between <b>€350 and €550/month</b> (utilities included) in university cities like Louvain-la-Neuve, Liège, and Ghent.
+              </div>
+            </div>
+
+            <div class="faq-accordion-item">
+              <div class="faq-accordion-header">
+                <span class="faq-accordion-question">❓ What happens after I graduate from my Master's?</span>
+                <span class="faq-accordion-icon">▼</span>
+              </div>
+              <div class="faq-accordion-body">
+                Upon graduation, you are legally entitled to a <b>12-month post-study residence permit ("Zoekjaar" / Search Year)</b>. This gives you 1 full year to find a software or tech job anywhere in Belgium and transition smoothly to a Belgian Single Permit with reduced salary thresholds for recent graduates.
+              </div>
+            </div>
           </div>
         </div>
       </div>
     `;
+
+    // 1. Wire Sub-Tab Navigation
+    const tabBtns = container.querySelectorAll(".guide-tab-btn");
+    const panels = container.querySelectorAll(".guide-panel");
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.tab;
+        tabBtns.forEach(b => b.classList.remove("active"));
+        panels.forEach(p => p.classList.remove("active"));
+
+        btn.classList.add("active");
+        const panel = container.querySelector(`#tab-${target}`);
+        if (panel) panel.classList.add("active");
+      });
+    });
+
+    // 2. Wire Interactive Checklist Progress & Storage
+    const updateChecklistProgress = () => {
+      const activeCount = checklistItems.filter(item => savedChecks[item.id]).length;
+      const pct = Math.round((activeCount / checklistItems.length) * 100);
+      const textEl = document.getElementById("checklistProgressText");
+      const fillEl = document.getElementById("checklistProgressFill");
+
+      if (textEl) textEl.textContent = `${activeCount} of ${checklistItems.length} documents ready (${pct}%)`;
+      if (fillEl) fillEl.style.width = `${pct}%`;
+
+      try {
+        localStorage.setItem("bmp_doc_checklist", JSON.stringify(savedChecks));
+      } catch (e) {
+        console.warn("Could not save checklist state:", e);
+      }
+    };
+
+    container.querySelectorAll(".checklist-item-row").forEach(row => {
+      const id = row.dataset.id;
+      const checkbox = row.querySelector(".checklist-checkbox");
+
+      const toggleItem = () => {
+        const isChecked = !savedChecks[id];
+        savedChecks[id] = isChecked;
+        if (checkbox) checkbox.checked = isChecked;
+        row.classList.toggle("checked", isChecked);
+        updateChecklistProgress();
+      };
+
+      row.addEventListener("click", (e) => {
+        if (e.target !== checkbox) {
+          toggleItem();
+        }
+      });
+
+      if (checkbox) {
+        checkbox.addEventListener("change", () => {
+          savedChecks[id] = checkbox.checked;
+          row.classList.toggle("checked", checkbox.checked);
+          updateChecklistProgress();
+        });
+      }
+    });
+
+    // 3. Checklist Filters (All, Academic, Visa)
+    const filterBtns = container.querySelectorAll(".checklist-filter-btn");
+    filterBtns.forEach(fBtn => {
+      fBtn.addEventListener("click", () => {
+        filterBtns.forEach(b => b.classList.remove("active"));
+        fBtn.classList.add("active");
+        const filter = fBtn.dataset.filter;
+
+        container.querySelectorAll(".checklist-group").forEach(group => {
+          if (filter === "all") {
+            group.style.display = "flex";
+          } else {
+            group.style.display = group.dataset.col === filter ? "flex" : "none";
+          }
+        });
+      });
+    });
+
+    // 4. Checklist Copy to Clipboard
+    const copyBtn = document.getElementById("checklistCopyBtn");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", () => {
+        const lines = checklistItems.map(item => {
+          const status = savedChecks[item.id] ? "[X]" : "[ ]";
+          return `${status} ${item.title} — ${item.note}`;
+        });
+        const text = "BELGIUM MASTER'S & VISA DOCUMENT CHECKLIST\n\n" + lines.join("\n");
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = copyBtn.textContent;
+          copyBtn.textContent = "✓ Copied!";
+          setTimeout(() => { copyBtn.textContent = orig; }, 2000);
+        }).catch(() => {
+          alert("Checklist copied to clipboard!");
+        });
+      });
+    }
+
+    // 5. Checklist Reset
+    const resetBtn = document.getElementById("checklistResetBtn");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        if (confirm("Reset all checked documents?")) {
+          savedChecks = {};
+          container.querySelectorAll(".checklist-item-row").forEach(r => {
+            r.classList.remove("checked");
+            const chk = r.querySelector(".checklist-checkbox");
+            if (chk) chk.checked = false;
+          });
+          updateChecklistProgress();
+        }
+      });
+    }
+
+    // 6. Accordion FAQs Toggle
+    container.querySelectorAll(".faq-accordion-header").forEach(hdr => {
+      hdr.addEventListener("click", () => {
+        const item = hdr.closest(".faq-accordion-item");
+        if (item) {
+          item.classList.toggle("open");
+        }
+      });
+    });
   }
 
   // --- ECTS CALCULATOR MODAL ---
