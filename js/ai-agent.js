@@ -14,7 +14,8 @@ export class BelgiumAiAgent {
     this.apiKey = localStorage.getItem("bmp_groq_key") || DEFAULT_GROQ_KEY;
     this.model = localStorage.getItem("bmp_groq_model") || PRIMARY_MODEL;
     this.activeUniversity = null;
-    this.messages = [];
+    this.threads = this.loadThreads();
+    this.activeThreadId = this.loadActiveThreadId();
     this.isOpen = false;
     this.isMaximized = false;
     this.isMinimized = false;
@@ -22,7 +23,7 @@ export class BelgiumAiAgent {
 
     this.initElements();
     this.bindEvents();
-    this.renderWelcome();
+    this.renderCurrentThread();
   }
 
   initElements() {
@@ -67,6 +68,34 @@ export class BelgiumAiAgent {
           </div>
         </div>
 
+        <!-- Chat Threads Toolbar -->
+        <div class="ai-threads-bar">
+          <button class="ai-threads-toggle-btn" id="aiThreadsToggleBtn" title="Switch or manage saved chats">
+            <span class="ai-thread-icon">💬</span>
+            <span class="ai-thread-current-title" id="aiActiveThreadTitle">New Chat</span>
+            <span class="ai-thread-count-badge" id="aiThreadCountBadge">1</span>
+            <span class="ai-thread-arrow">▾</span>
+          </button>
+          <div class="ai-thread-actions-bar">
+            <button class="ai-thread-btn" id="aiRenameChatBtn" title="Rename this chat">✏️</button>
+            <button class="ai-thread-btn" id="aiDeleteChatBtn" title="Delete this chat">🗑️</button>
+            <button class="ai-thread-btn ai-new-chat-btn" id="aiNewChatBtn" title="Start a new chat">
+              <span>+ New Chat</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Saved Chats Drawer / History Dropdown -->
+        <div class="ai-threads-drawer hidden" id="aiThreadsDrawer">
+          <div class="ai-drawer-header">
+            <span>Saved Chat Sessions</span>
+            <button class="ai-thread-btn ai-new-chat-btn" id="aiDrawerNewChatBtn">+ New</button>
+          </div>
+          <div class="ai-threads-list" id="aiThreadsList">
+            <!-- Saved threads injected here -->
+          </div>
+        </div>
+
         <!-- Active University Context Chip -->
         <div id="aiActiveContextBar" class="ai-context-bar hidden">
           <span class="ai-ctx-label">Context:</span>
@@ -96,28 +125,42 @@ export class BelgiumAiAgent {
         </div>
 
         <!-- Input Area -->
-        <div class="ai-input-area">
-          <div class="ai-input-box">
+        <div class="ai-input-area" id="aiInputArea">
+          <div class="ai-input-box" id="aiInputBox">
             <textarea
               id="aiChatInput"
-              rows="1"
+              rows="2"
               placeholder="Ask a question or type '#' to mention a university..."
               aria-label="Message AI Agent"
             ></textarea>
-            <button id="aiSendBtn" class="ai-send-btn" title="Send message">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </button>
+            <div class="ai-input-actions">
+              <button id="aiExpandInputBtn" class="ai-input-tool-btn" title="Expand / collapse prompt box (see full prompt)" aria-label="Expand prompt">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                </svg>
+              </button>
+              <button id="aiSendBtn" class="ai-send-btn" title="Send message (Enter)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="ai-footer-note">
-            <span>Tip: Type <b>#</b> to tag any university. Powered by Groq Ultra-Fast Inference.</span>
+            <span>Tip: Type <b>#</b> to tag any university. Shift+Enter for new line.</span>
           </div>
         </div>
 
-        <!-- Resize Handle (bottom-right) -->
-        <div class="ai-resize-handle" id="aiResizeHandle"></div>
+        <!-- 8-Directional Resize Handles -->
+        <div class="ai-resize-edge ai-resize-n" data-dir="n" title="Resize"></div>
+        <div class="ai-resize-edge ai-resize-s" data-dir="s" title="Resize"></div>
+        <div class="ai-resize-edge ai-resize-w" data-dir="w" title="Resize"></div>
+        <div class="ai-resize-edge ai-resize-e" data-dir="e" title="Resize"></div>
+        <div class="ai-resize-corner ai-resize-nw" data-dir="nw" title="Resize"></div>
+        <div class="ai-resize-corner ai-resize-ne" data-dir="ne" title="Resize"></div>
+        <div class="ai-resize-corner ai-resize-sw" data-dir="sw" title="Resize"></div>
+        <div class="ai-resize-corner ai-resize-se" data-dir="se" title="Resize"></div>
       </div>
 
       <!-- Settings Modal -->
@@ -160,6 +203,17 @@ export class BelgiumAiAgent {
     this.contextBar = document.getElementById("aiActiveContextBar");
     this.ctxName = document.getElementById("aiCtxName");
     this.suggestions = document.getElementById("aiSuggestions");
+
+    // Chat threads elements
+    this.threadsToggleBtn = document.getElementById("aiThreadsToggleBtn");
+    this.activeThreadTitleEl = document.getElementById("aiActiveThreadTitle");
+    this.threadCountBadgeEl = document.getElementById("aiThreadCountBadge");
+    this.threadsDrawer = document.getElementById("aiThreadsDrawer");
+    this.threadsList = document.getElementById("aiThreadsList");
+    this.newChatBtn = document.getElementById("aiNewChatBtn");
+    this.drawerNewChatBtn = document.getElementById("aiDrawerNewChatBtn");
+    this.renameChatBtn = document.getElementById("aiRenameChatBtn");
+    this.deleteChatBtn = document.getElementById("aiDeleteChatBtn");
   }
 
   bindEvents() {
@@ -231,13 +285,47 @@ export class BelgiumAiAgent {
     // Setup resize handle
     this.setupResizable();
 
+    // Chat Threads & Sessions Controls
+    this.threadsToggleBtn.addEventListener("click", () => this.toggleThreadsDrawer());
+    this.newChatBtn.addEventListener("click", () => this.createNewChat());
+    this.drawerNewChatBtn.addEventListener("click", () => this.createNewChat());
+    this.renameChatBtn.addEventListener("click", () => this.renameCurrentChat());
+    this.deleteChatBtn.addEventListener("click", () => this.deleteCurrentChat());
+
+    // Expand/Collapse prompt input button
+    const expandBtn = document.getElementById("aiExpandInputBtn");
+    const inputBox = document.getElementById("aiInputBox");
+    if (expandBtn && inputBox) {
+      expandBtn.addEventListener("click", () => {
+        const isExp = inputBox.classList.toggle("expanded");
+        expandBtn.title = isExp ? "Collapse prompt box" : "Expand prompt box (see full prompt)";
+        expandBtn.innerHTML = isExp ? `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
+          </svg>
+        ` : `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+          </svg>
+        `;
+        if (isExp) {
+          this.input.style.height = "180px";
+        } else {
+          this.autoResizeInput();
+        }
+        this.input.focus();
+      });
+    }
+
     // Populate suggested prompts
     this.renderSuggestions();
   }
 
   autoResizeInput() {
+    const inputBox = document.getElementById("aiInputBox");
+    if (inputBox && inputBox.classList.contains("expanded")) return;
     this.input.style.height = "auto";
-    this.input.style.height = Math.min(this.input.scrollHeight, 120) + "px";
+    this.input.style.height = Math.max(48, Math.min(this.input.scrollHeight, 150)) + "px";
   }
 
   handleMentionTrigger() {
@@ -300,12 +388,235 @@ export class BelgiumAiAgent {
 
   setUniversityContext(uni) {
     this.activeUniversity = uni;
+    const thread = this.getActiveThread();
+    if (thread) {
+      thread.activeUniversity = uni;
+      this.saveThreads();
+    }
     if (uni) {
       this.contextBar.classList.remove("hidden");
       this.ctxName.textContent = `${uni.u} (${uni.pill})`;
     } else {
       this.contextBar.classList.add("hidden");
     }
+  }
+
+  /* ==========================================================================
+     Chat Threads & Sessions Management (Saved in localStorage)
+     ========================================================================== */
+  loadThreads() {
+    try {
+      const raw = localStorage.getItem("bmp_ai_threads_v2");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load saved AI chats:", e);
+    }
+    return [this.createBlankThread("New Chat")];
+  }
+
+  loadActiveThreadId() {
+    const saved = localStorage.getItem("bmp_ai_active_thread_id");
+    if (saved && this.threads.some(t => t.id === saved)) {
+      return saved;
+    }
+    return this.threads[0]?.id || "";
+  }
+
+  saveThreads() {
+    try {
+      localStorage.setItem("bmp_ai_threads_v2", JSON.stringify(this.threads));
+      localStorage.setItem("bmp_ai_active_thread_id", this.activeThreadId);
+    } catch (e) {
+      console.warn("Could not save AI chats to localStorage:", e);
+    }
+  }
+
+  getActiveThread() {
+    let thread = this.threads.find(t => t.id === this.activeThreadId);
+    if (!thread) {
+      thread = this.threads[0];
+      if (!thread) {
+        thread = this.createBlankThread("New Chat");
+        this.threads.push(thread);
+      }
+      this.activeThreadId = thread.id;
+    }
+    return thread;
+  }
+
+  createBlankThread(title = "New Chat") {
+    return {
+      id: "t_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+      title: title,
+      messages: [],
+      activeUniversity: null,
+      updatedAt: Date.now()
+    };
+  }
+
+  createNewChat() {
+    const thread = this.createBlankThread("New Chat");
+    this.threads.unshift(thread);
+    this.activeThreadId = thread.id;
+    this.saveThreads();
+    this.renderCurrentThread();
+    this.renderThreadsList();
+    this.toggleThreadsDrawer(false);
+    this.input.focus();
+  }
+
+  renameCurrentChat() {
+    this.renameChat(this.activeThreadId);
+  }
+
+  renameChat(threadId) {
+    const thread = this.threads.find(t => t.id === threadId);
+    if (!thread) return;
+    const current = thread.title || "New Chat";
+    const newName = prompt("Enter a new title for this chat:", current);
+    if (newName && newName.trim()) {
+      thread.title = newName.trim();
+      thread.updatedAt = Date.now();
+      this.saveThreads();
+      this.updateThreadsHeaderUI();
+      this.renderThreadsList();
+    }
+  }
+
+  deleteCurrentChat() {
+    this.deleteChat(this.activeThreadId);
+  }
+
+  deleteChat(threadId) {
+    const thread = this.threads.find(t => t.id === threadId);
+    if (!thread) return;
+    const ok = confirm(`Delete chat "${thread.title}"?`);
+    if (!ok) return;
+
+    if (this.threads.length <= 1) {
+      // Just reset current thread if it's the only one
+      thread.title = "New Chat";
+      thread.messages = [];
+      thread.activeUniversity = null;
+      thread.updatedAt = Date.now();
+    } else {
+      this.threads = this.threads.filter(t => t.id !== threadId);
+      if (this.activeThreadId === threadId) {
+        this.activeThreadId = this.threads[0].id;
+      }
+    }
+
+    this.saveThreads();
+    this.renderCurrentThread();
+    this.renderThreadsList();
+  }
+
+  switchChat(threadId) {
+    if (this.activeThreadId === threadId) {
+      this.toggleThreadsDrawer(false);
+      return;
+    }
+    this.activeThreadId = threadId;
+    this.saveThreads();
+    this.renderCurrentThread();
+    this.renderThreadsList();
+    this.toggleThreadsDrawer(false);
+  }
+
+  toggleThreadsDrawer(forceState) {
+    const isHidden = this.threadsDrawer.classList.contains("hidden");
+    const nextHidden = typeof forceState === "boolean" ? !forceState : !isHidden;
+    this.threadsDrawer.classList.toggle("hidden", nextHidden);
+    this.threadsToggleBtn.classList.toggle("ai-threads-drawer-open", !nextHidden);
+    if (!nextHidden) {
+      this.renderThreadsList();
+    }
+  }
+
+  updateThreadsHeaderUI() {
+    const thread = this.getActiveThread();
+    if (this.activeThreadTitleEl) {
+      this.activeThreadTitleEl.textContent = thread.title || "New Chat";
+      this.activeThreadTitleEl.title = thread.title || "New Chat";
+    }
+    if (this.threadCountBadgeEl) {
+      this.threadCountBadgeEl.textContent = this.threads.length;
+    }
+  }
+
+  renderCurrentThread() {
+    const thread = this.getActiveThread();
+    this.updateThreadsHeaderUI();
+    this.chatBody.innerHTML = "";
+
+    // Set university context if thread had one
+    this.setUniversityContext(thread.activeUniversity || null);
+
+    if (thread.messages && thread.messages.length > 0) {
+      for (const m of thread.messages) {
+        this.renderMessageElement(m.role, m.content);
+      }
+      this.scrollToBottom();
+    } else {
+      this.renderWelcome();
+    }
+    this.renderThreadsList();
+  }
+
+  renderThreadsList() {
+    if (!this.threadsList) return;
+    this.threadsList.innerHTML = this.threads.map(t => {
+      const isActive = t.id === this.activeThreadId;
+      const msgCount = (t.messages || []).length;
+      const timeStr = new Date(t.updatedAt || Date.now()).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric"
+      });
+      return `
+        <div class="ai-thread-item ${isActive ? "active" : ""}" data-id="${t.id}">
+          <div class="ai-thread-item-info">
+            <span class="ai-thread-item-title">${this.escapeHtml(t.title || "New Chat")}</span>
+            <span class="ai-thread-item-meta">${msgCount} messages · ${timeStr}</span>
+          </div>
+          <div class="ai-thread-item-actions">
+            <button class="ai-thread-item-btn ai-item-rename" title="Rename chat" data-id="${t.id}">✏️</button>
+            <button class="ai-thread-item-btn ai-item-delete" title="Delete chat" data-id="${t.id}">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    this.threadsList.querySelectorAll(".ai-thread-item").forEach(item => {
+      item.addEventListener("click", (e) => {
+        if (e.target.closest(".ai-thread-item-btn")) return;
+        const id = item.dataset.id;
+        this.switchChat(id);
+      });
+    });
+
+    this.threadsList.querySelectorAll(".ai-item-rename").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.renameChat(btn.dataset.id);
+      });
+    });
+
+    this.threadsList.querySelectorAll(".ai-item-delete").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.deleteChat(btn.dataset.id);
+      });
+    });
+  }
+
+  escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
   renderSuggestions() {
@@ -350,6 +661,7 @@ export class BelgiumAiAgent {
     this.win.classList.add("hidden");
     this.trigger.classList.remove("active");
     this.isOpen = false;
+    this.toggleThreadsDrawer(false);
   }
 
   minimizeWindow() {
@@ -387,8 +699,27 @@ export class BelgiumAiAgent {
     const query = this.input.value.trim();
     if (!query || this.isLoading) return;
 
-    // Append user message
-    this.appendMessage("user", query);
+    const thread = this.getActiveThread();
+
+    // Auto-generate title on first user query if still default
+    if (!thread.title || thread.title === "New Chat") {
+      let cleanTitle = query.replace(/[#@\[\]*`]/g, "").trim();
+      if (cleanTitle.length > 26) {
+        cleanTitle = cleanTitle.slice(0, 24) + "...";
+      }
+      thread.title = cleanTitle || "Research Chat";
+      this.updateThreadsHeaderUI();
+      this.renderThreadsList();
+    }
+
+    // Append user message to thread state and UI
+    thread.messages.push({ role: "user", content: query, timestamp: Date.now() });
+    thread.updatedAt = Date.now();
+    this.saveThreads();
+
+    this.renderMessageElement("user", query);
+    this.scrollToBottom();
+
     this.input.value = "";
     this.autoResizeInput();
     this.mentionPopover.classList.add("hidden");
@@ -399,14 +730,25 @@ export class BelgiumAiAgent {
     try {
       const response = await this.queryGroq(query);
       this.removeLoading(loaderId);
-      this.appendMessage("bot", response);
+      this.renderMessageElement("bot", response);
+      this.scrollToBottom();
+
+      thread.messages.push({ role: "bot", content: response, timestamp: Date.now() });
+      thread.updatedAt = Date.now();
+      this.saveThreads();
+      this.renderThreadsList();
     } catch (err) {
       this.removeLoading(loaderId);
-      this.appendMessage("bot", `⚠️ **Error connecting to AI Research Agent:**\n\n${err.message}\n\nPlease check your Groq API key in ⚙️ Settings or try again.`);
+      const errMsg = `⚠️ **Error connecting to AI Research Agent:**\n\n${err.message}\n\nPlease check your Groq API key in ⚙️ Settings or try again.`;
+      this.renderMessageElement("bot", errMsg);
+      this.scrollToBottom();
+
+      thread.messages.push({ role: "bot", content: errMsg, timestamp: Date.now() });
+      this.saveThreads();
     }
   }
 
-  appendMessage(role, text) {
+  renderMessageElement(role, text) {
     const msgDiv = document.createElement("div");
     msgDiv.className = `ai-message ai-${role}`;
     const bubble = document.createElement("div");
@@ -420,7 +762,10 @@ export class BelgiumAiAgent {
 
     msgDiv.appendChild(bubble);
     this.chatBody.appendChild(msgDiv);
-    this.messages.push({ role, content: text });
+  }
+
+  appendMessage(role, text) {
+    this.renderMessageElement(role, text);
     this.scrollToBottom();
   }
 
@@ -436,7 +781,7 @@ export class BelgiumAiAgent {
         <div class="ai-typing-indicator">
           <span></span><span></span><span></span>
         </div>
-        <span class="ai-loading-label">Researching official Belgian decrees &amp; university specs...</span>
+        <span class="ai-loading-label">Researching official Belgian decrees &amp; specs...</span>
       </div>
     `;
     this.chatBody.appendChild(loaderDiv);
@@ -512,13 +857,22 @@ ${uniList}
 
 ${activeContextText}
 
-RESPONSE GUIDELINES:
-1. Always be direct, authoritative, structured, and polite.
-2. Provide concrete PROOF and CITATIONS (e.g. quote the ARES circular, Flemish Codex, Office des Étrangers Article 60, or university admissions regulations).
-3. If asked about fees, clearly separate TUITION from the BLOCKED ACCOUNT (living expenses returned to student).
-4. If asked about math credits, remind the applicant that Pakistani/US semester credit hours convert to ECTS at ~1:2 (15 credits = ~30 ECTS).
-5. Format your answers beautifully using GitHub-flavored Markdown with bold headings, bullet points, and tables where helpful.
-6. Keep answers concise yet fully comprehensive without unnecessary fluff.`;
+CRITICAL RESPONSE GUIDELINES (STRICT CONCISENESS & PROPER FORMATTING):
+1. MANDATORY BREVITY:
+   - Always give SHORT, concise, and scannable answers.
+   - Avoid conversational filler (do NOT say "Certainly!", "I hope this helps!", or "As an academic advisor..."). Start immediately with the answer.
+   - Limit responses to 2 to 4 concise bullet points or short paragraphs maximum, unless explicitly asked for a long breakdown.
+   - If the user asks for a short answer, summary, or bullet points, answer in 2-4 brief bullet points immediately with ZERO fluff.
+2. CLEAN FORMATTING & STRUCTURE:
+   - Use bold subheadings (### Heading) to divide topics cleanly.
+   - Use compact bullet points (- Item) for sequential steps or requirements.
+   - ALWAYS use Markdown Tables (| University | Tuition | Deadline |) when comparing numbers, fees, or universities.
+   - Bold key numbers and terms (e.g., **€1,194/year**, **€803/month**, **30 ECTS**).
+   - Never output walls of continuous text or giant paragraphs.
+3. BRIEF CITATIONS:
+   - Mention legal basis briefly in parentheses (e.g. *[ARES circular 2026/27]* or *[Aliens Act Art. 60]*). Do not copy-paste long legal statute text.
+4. If asked about fees, clearly separate TUITION from the BLOCKED ACCOUNT living expenses.
+5. If asked about math credits, remind that 15 semester credit hours ≈ 30 ECTS (1 credit ≈ 2 ECTS).`;
   }
 
   async queryGroq(userQuery) {
@@ -527,16 +881,20 @@ RESPONSE GUIDELINES:
     }
 
     const systemPrompt = this.buildSystemPrompt();
+    const thread = this.getActiveThread();
 
-    // Contextual message history
+    // Contextual message history from current active thread (up to last 6 messages)
+    const threadHistory = (thread.messages || [])
+      .slice(-6)
+      .map(m => ({ role: m.role === "bot" ? "assistant" : "user", content: m.content }));
+
     const apiMessages = [
       { role: "system", content: systemPrompt },
-      ...this.messages.slice(-6).map(m => ({ role: m.role === "bot" ? "assistant" : "user", content: m.content })),
+      ...threadHistory,
       { role: "user", content: userQuery }
     ];
 
     const modelsToTry = [this.model, ...FALLBACK_MODELS.filter(m => m !== this.model)];
-
     let lastError = null;
 
     for (const modelCandidate of modelsToTry) {
@@ -550,8 +908,8 @@ RESPONSE GUIDELINES:
           body: JSON.stringify({
             model: modelCandidate,
             messages: apiMessages,
-            temperature: 0.3,
-            max_tokens: 1500
+            temperature: 0.2,
+            max_tokens: 1200
           })
         });
 
@@ -581,41 +939,181 @@ RESPONSE GUIDELINES:
     throw lastError || new Error("Failed to contact Groq API endpoint.");
   }
 
-  renderMarkdown(text) {
-    if (!text) return "";
-    let html = text
-      // Escape HTML tags to prevent XSS
+  /* ==========================================================================
+     Robust Markdown Parser with Tables, Lists, Code, & Headings
+     ========================================================================== */
+  renderMarkdown(rawText) {
+    if (!rawText) return "";
+
+    // 1. Normalize line endings
+    let src = rawText.replace(/\r\n/g, "\n");
+
+    // 2. Extract and protect code blocks
+    const codeBlocks = [];
+    src = src.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+      const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
+      const escapedCode = code
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      codeBlocks.push(`
+        <pre class="ai-code-block">
+          <div class="ai-code-header"><span>${lang || "code"}</span></div>
+          <code>${escapedCode}</code>
+        </pre>
+      `);
+      return placeholder;
+    });
+
+    // 3. Escape HTML in regular text
+    src = src
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      // Headers
-      .replace(/^### (.*$)/gim, "<h5>$1</h5>")
-      .replace(/^## (.*$)/gim, "<h4>$1</h4>")
-      .replace(/^# (.*$)/gim, "<h3>$1</h3>")
-      // Bold & Italic
-      .replace(/\*\*\*(.*?)\*\*\*/gim, "<b><i>$1</i></b>")
-      .replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>")
-      .replace(/\*(.*?)\*/gim, "<i>$1</i>")
-      // Inline code
-      .replace(/`([^`]+)`/gim, "<code>$1</code>")
+      .replace(/>/g, "&gt;");
+
+    // 4. Parse block by block
+    const lines = src.split("\n");
+    const blocks = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+
+      // Code block placeholder
+      if (line.startsWith("__CODE_BLOCK_") && line.endsWith("__")) {
+        const idx = parseInt(line.replace(/[^0-9]/g, ""), 10);
+        blocks.push(codeBlocks[idx] || "");
+        i++;
+        continue;
+      }
+
+      // Markdown Table: line has pipes and next line is delimiter |---|
+      if (line.includes("|") && i + 1 < lines.length && /^\s*\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/.test(lines[i + 1])) {
+        const headerLine = lines[i];
+        const headers = headerLine.split("|").map(s => s.trim()).filter((s, idx, arr) => !(idx === 0 && s === "") && !(idx === arr.length - 1 && s === ""));
+        
+        const rows = [];
+        i += 2; // skip header and delimiter lines
+
+        while (i < lines.length && lines[i].trim().includes("|") && lines[i].trim() !== "") {
+          const rowCells = lines[i].split("|").map(s => s.trim()).filter((s, idx, arr) => !(idx === 0 && s === "") && !(idx === arr.length - 1 && s === ""));
+          rows.push(rowCells);
+          i++;
+        }
+
+        let tableHtml = '<div class="ai-table-wrap"><table class="ai-table"><thead><tr>';
+        headers.forEach(h => {
+          tableHtml += `<th>${this.formatInline(h)}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
+        rows.forEach(r => {
+          tableHtml += '<tr>';
+          headers.forEach((_, cIdx) => {
+            tableHtml += `<td>${this.formatInline(r[cIdx] || "")}</td>`;
+          });
+          tableHtml += '</tr>';
+        });
+        tableHtml += '</tbody></table></div>';
+        blocks.push(tableHtml);
+        continue;
+      }
+
+      // Headings
+      if (/^### (.*$)/.test(line)) {
+        const title = line.replace(/^###\s+/, "");
+        blocks.push(`<h5 class="ai-h5">${this.formatInline(title)}</h5>`);
+        i++;
+        continue;
+      }
+      if (/^## (.*$)/.test(line)) {
+        const title = line.replace(/^##\s+/, "");
+        blocks.push(`<h4 class="ai-h4">${this.formatInline(title)}</h4>`);
+        i++;
+        continue;
+      }
+      if (/^# (.*$)/.test(line)) {
+        const title = line.replace(/^#\s+/, "");
+        blocks.push(`<h3 class="ai-h3">${this.formatInline(title)}</h3>`);
+        i++;
+        continue;
+      }
+
       // Blockquotes
-      .replace(/^\> (.*$)/gim, "<blockquote>$1</blockquote>")
-      // Bullet lists
-      .replace(/^\s*[-*]\s+(.*$)/gim, "<li>$1</li>")
-      // Numbered lists
-      .replace(/^\s*\d+\.\s+(.*$)/gim, "<li>$1</li>")
-      // Links
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>')
-      // Paragraphs & Linebreaks
-      .replace(/\n\n+/gim, "</p><p>")
-      .replace(/\n/gim, "<br>");
+      if (/^&gt;\s*(.*$)/.test(line)) {
+        let bq = line.replace(/^&gt;\s*/, "");
+        i++;
+        while (i < lines.length && /^&gt;\s*(.*$)/.test(lines[i].trim())) {
+          bq += " " + lines[i].trim().replace(/^&gt;\s*/, "");
+          i++;
+        }
+        blocks.push(`<blockquote>${this.formatInline(bq)}</blockquote>`);
+        continue;
+      }
 
-    // Wrap list items
-    html = html.replace(/(<li>.*?<\/li>)/gis, "<ul>$1</ul>");
-    // Clean up duplicated <ul> tags
-    html = html.replace(/<\/ul>\s*<ul>/gis, "");
+      // Bullet Lists
+      if (/^[-*•]\s+(.*$)/.test(line)) {
+        let listHtml = '<ul class="ai-ul">';
+        while (i < lines.length && /^[-*•]\s+(.*$)/.test(lines[i].trim())) {
+          const itemText = lines[i].trim().replace(/^[-*•]\s+/, "");
+          listHtml += `<li>${this.formatInline(itemText)}</li>`;
+          i++;
+        }
+        listHtml += '</ul>';
+        blocks.push(listHtml);
+        continue;
+      }
 
-    return `<p>${html}</p>`;
+      // Numbered Lists
+      if (/^\d+\.\s+(.*$)/.test(line)) {
+        let listHtml = '<ol class="ai-ol">';
+        while (i < lines.length && /^\d+\.\s+(.*$)/.test(lines[i].trim())) {
+          const itemText = lines[i].trim().replace(/^\d+\.\s+/, "");
+          listHtml += `<li>${this.formatInline(itemText)}</li>`;
+          i++;
+        }
+        listHtml += '</ol>';
+        blocks.push(listHtml);
+        continue;
+      }
+
+      // Blank line
+      if (line === "") {
+        i++;
+        continue;
+      }
+
+      // Regular Paragraph (accumulate adjacent lines)
+      let pText = line;
+      i++;
+      while (i < lines.length && lines[i].trim() !== "" &&
+             !lines[i].trim().startsWith("#") &&
+             !lines[i].trim().startsWith("-") &&
+             !lines[i].trim().startsWith("*") &&
+             !lines[i].trim().startsWith("•") &&
+             !/^\d+\.\s+/.test(lines[i].trim()) &&
+             !lines[i].trim().startsWith("&gt;") &&
+             !lines[i].trim().includes("|") &&
+             !lines[i].trim().startsWith("__CODE_BLOCK_")) {
+        pText += " " + lines[i].trim();
+        i++;
+      }
+      blocks.push(`<p>${this.formatInline(pText)}</p>`);
+    }
+
+    return blocks.join("");
+  }
+
+  formatInline(text) {
+    if (!text) return "";
+    return text
+      // Bold & Italic
+      .replace(/\*\*\*(.*?)\*\*\*/g, "<b><i>$1</i></b>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+      // Inline code
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      // Markdown Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>');
   }
 
   setupDraggable() {
@@ -660,35 +1158,88 @@ RESPONSE GUIDELINES:
   }
 
   setupResizable() {
-    const handle = document.getElementById("aiResizeHandle");
+    const handles = this.win.querySelectorAll("[data-dir]");
     let isResizing = false;
-    let startX, startY, startW, startH;
+    let currentDir = "";
+    let startX, startY, startW, startH, startLeft, startTop;
 
-    handle.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      if (this.isMaximized) return;
-      isResizing = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      startW = this.win.offsetWidth;
-      startH = this.win.offsetHeight;
+    handles.forEach(handle => {
+      handle.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.isMaximized) return;
 
-      const onMouseMove = (ev) => {
-        if (!isResizing) return;
-        const newW = Math.max(340, Math.min(window.innerWidth - 40, startW + (ev.clientX - startX)));
-        const newH = Math.max(380, Math.min(window.innerHeight - 40, startH + (ev.clientY - startY)));
-        this.win.style.width = `${newW}px`;
-        this.win.style.height = `${newH}px`;
-      };
+        isResizing = true;
+        currentDir = handle.dataset.dir;
 
-      const onMouseUp = () => {
-        isResizing = false;
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
-      };
+        const rect = this.win.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        startW = rect.width;
+        startH = rect.height;
+        startLeft = rect.left;
+        startTop = rect.top;
 
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+        // Anchor window to explicit pixel positions so resizing from top/left is stable
+        this.win.style.bottom = "auto";
+        this.win.style.right = "auto";
+        this.win.style.left = `${startLeft}px`;
+        this.win.style.top = `${startTop}px`;
+        this.win.style.width = `${startW}px`;
+        this.win.style.height = `${startH}px`;
+
+        document.body.style.userSelect = "none";
+        document.body.style.cursor = window.getComputedStyle(handle).cursor;
+
+        const onMouseMove = (ev) => {
+          if (!isResizing) return;
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+
+          let newW = startW;
+          let newH = startH;
+          let newLeft = startLeft;
+          let newTop = startTop;
+
+          // Horizontal resizing
+          if (currentDir.includes("e")) {
+            newW = Math.max(340, Math.min(window.innerWidth - startLeft - 15, startW + dx));
+          } else if (currentDir.includes("w")) {
+            const proposedW = startW - dx;
+            if (proposedW >= 340 && startLeft + dx >= 10) {
+              newW = proposedW;
+              newLeft = startLeft + dx;
+            }
+          }
+
+          // Vertical resizing
+          if (currentDir.includes("s")) {
+            newH = Math.max(380, Math.min(window.innerHeight - startTop - 15, startH + dy));
+          } else if (currentDir.includes("n")) {
+            const proposedH = startH - dy;
+            if (proposedH >= 380 && startTop + dy >= 10) {
+              newH = proposedH;
+              newTop = startTop + dy;
+            }
+          }
+
+          this.win.style.width = `${newW}px`;
+          this.win.style.height = `${newH}px`;
+          this.win.style.left = `${newLeft}px`;
+          this.win.style.top = `${newTop}px`;
+        };
+
+        const onMouseUp = () => {
+          isResizing = false;
+          document.body.style.userSelect = "";
+          document.body.style.cursor = "";
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      });
     });
   }
 }
