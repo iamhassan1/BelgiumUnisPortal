@@ -1,0 +1,157 @@
+/* Base CSS, Variables, Reset, and Themes */
+:root {
+  --font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Light Theme */
+  --bg: #F8FAFC;
+  --bg-subtle: #F1F5F9;
+  --card: #FFFFFF;
+  --card-hover: #FFFFFF;
+  --bd: #E2E8F0;
+  --bd-focus: #3B82F6;
+  --tx: #0F172A;
+  --tx-muted: #64748B;
+  --tx-light: #94A3B8;
+
+  /* Accent Colors */
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-subtle: #EFF6FF;
+  --primary-text: #1E40AF;
+
+  --success: #059669;
+  --success-subtle: #ECFDF5;
+  --success-text: #065F46;
+
+  --purple: #7C3AED;
+  --purple-subtle: #F5F3FF;
+  --purple-text: #5B21B6;
+
+  --amber: #D97706;
+  --amber-subtle: #FFFBEB;
+  --amber-text: #92400E;
+
+  --danger: #DC2626;
+  --danger-subtle: #FEF2F2;
+  --danger-text: #991B1B;
+
+  --chip-bg: #F1F5F9;
+  --chip-text: #334155;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.09), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  --glass-bg: rgba(255, 255, 255, 0.94);
+  --glass-border: rgba(226, 232, 240, 0.9);
+}
+
+[data-theme="dark"] {
+  --bg: #090D16;
+  --bg-subtle: #0F172A;
+  --card: #131D31;
+  --card-hover: #18243D;
+  --bd: #1E2E4A;
+  --bd-focus: #3B82F6;
+  --tx: #F8FAFC;
+  --tx-muted: #94A3B8;
+  --tx-light: #64748B;
+
+  --primary: #3B82F6;
+  --primary-hover: #60A5FA;
+  --primary-subtle: #172554;
+  --primary-text: #93C5FD;
+
+  --success: #10B981;
+  --success-subtle: #064E3B;
+  --success-text: #6EE7B7;
+
+  --purple: #A855F7;
+  --purple-subtle: #3B0764;
+  --purple-text: #D8B4FE;
+
+  --amber: #FBBF24;
+  --amber-subtle: #451A03;
+  --amber-text: #FDE68A;
+
+  --danger: #F87171;
+  --danger-subtle: #450A0A;
+  --danger-text: #FCA5A5;
+
+  --chip-bg: #1B283E;
+  --chip-text: #CBD5E1;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6);
+
+  --glass-bg: rgba(19, 29, 49, 0.94);
+  --glass-border: rgba(30, 46, 74, 0.9);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  color: var(--tx);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--tx);
+  line-height: 1.25;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88em;
+  background-color: var(--chip-bg);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+}
+
+.mu {
+  color: var(--tx-muted);
+  font-size: 13px;
+}

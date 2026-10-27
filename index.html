@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Belgium CS, AI &amp; Game Design Master’s Portal | Accredited Universities &amp; Visa Guide</title>
+  <meta name="description" content="Discover, compare, and apply for English-taught Computer Science, AI, and Game Design Master's degrees in Belgium under €2,000/yr with ARES exemptions, Master Mind scholarships, and AI research assistant.">
+  <meta name="keywords" content="Belgium Masters, CS Belgium, Game Design Belgium, UCLouvain, ULiège, VUB, KU Leuven, Master Mind Scholarship, ARES Exemption, Student Visa D">
+  <meta name="author" content="Belgium Higher Education Portal">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Belgium CS, AI &amp; Game Design Master’s Portal">
+  <meta property="og:description" content="Find low-cost Belgian Master's programs (<€2k/yr), Master Mind scholarships, and get real-time AI research.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇧🇪</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/university-page.css">
+  <link rel="stylesheet" href="css/ai-agent.css">
+</head>
+<body>
+  <!-- Global App Header -->
+  <header>
+    <div class="w">
+      <div class="header-bar">
+        <div class="logo-group">
+          <div class="logo-badge">🇧🇪</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Belgium Master's Portal</span>
+              <span class="region-badge" style="font-size:10px;padding:1px 6px;">CS &amp; Game Tech</span>
+            </div>
+            <span class="logo-sub">Under €2k/yr Wallonia Strategy &amp; Scholarships</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn" id="themeToggleBtn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">🌙</button>
+          <button class="btn" id="btnProfileModal" title="Customize Your Academic Profile" aria-label="Profile Evaluator">Profile Evaluator</button>
+          <button class="btn" id="btnFeesInfoModal" title="How Belgian University Fees Work" aria-label="How Fees Work">Fee Guide</button>
+          <button class="btn p" id="btnExportReport" title="Export Full Report as Markdown" aria-label="Export Markdown">Export Guide (.MD)</button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="main-nav" aria-label="Main Navigation">
+        <button class="active" data-view="discover">Discover</button>
+        <button data-view="compare">Compare <span id="navCompareCount"></span></button>
+        <button data-view="plan">Applications <span id="navPlanCount"></span></button>
+        <button data-view="costs">Cost Simulator</button>
+        <button data-view="guide">Visa &amp; Roadmap</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="w main-content">
+    <h1 style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">Belgium Computer Science, AI and Game Design Master's Degree Portal</h1>
+
+    <!-- 1. Discover View -->
+    <section class="view-section active" id="v-discover" aria-label="Discover Programs"></section>
+
+    <!-- 2. Dedicated Full University Page View -->
+    <section class="view-section" id="v-university-detail" aria-label="University Details Page"></section>
+
+    <!-- 3. Side-by-Side Compare View -->
+    <section class="view-section" id="v-compare" aria-label="Compare Programs"></section>
+
+    <!-- 4. Plan & Applications Tracker -->
+    <section class="view-section" id="v-plan" aria-label="Application Tracker"></section>
+
+    <!-- 5. Living & Blocked Account Cost Simulator -->
+    <section class="view-section" id="v-costs" aria-label="Cost Simulator"></section>
+
+    <!-- 6. Visa D & Embassy Roadmap Guide -->
+    <section class="view-section" id="v-guide" aria-label="Visa and Embassy Guide"></section>
+  </main>
+
+  <!-- Main Modular ES6 Application -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

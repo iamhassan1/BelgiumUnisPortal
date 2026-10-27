@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Belgium CS &amp; Game Design Master’s Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F8FAFC;--card:#fff;--bd:#E2E8F0;--tx:#0F172A;--mu:#64748B;--pr:#2563EB;--prs:#EFF6FF;--gr:#10B981;--grs:#ECFDF5;--grt:#047857;--pus:#F3E8FF;--put:#7E22CE;--ams:#FEF3C7;--amt:#B45309;--rds:#FEE2E2;--rdt:#B91C1C;--ch:#F1F5F9}
+[data-theme=dark]{--bg:#0B1120;--card:#111A2E;--bd:#1E293B;--tx:#E2E8F0;--mu:#94A3B8;--pr:#3B82F6;--prs:#172554;--grs:#052E22;--grt:#6EE7B7;--pus:#2E1065;--put:#D8B4FE;--ams:#3B2A05;--amt:#FCD34D;--rds:#450A0A;--rdt:#FCA5A5;--ch:#1E293B}
+*{box-sizing:border-box;margin:0}body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}a{color:var(--pr)}
+.w{max-width:1180px;margin:0 auto;padding:0 20px}
+header{background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:30}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:60px;flex-wrap:wrap;padding:8px 0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}.logo i{width:30px;height:30px;border-radius:8px;background:var(--pr);color:#fff;display:grid;place-items:center;font-style:normal}
+.btn{border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;border:1px solid var(--bd);background:var(--card);text-decoration:none;display:inline-block;text-align:center;transition:.15s}
+.btn:hover{border-color:var(--pr);color:var(--pr)}.btn.p{background:var(--pr);border-color:var(--pr);color:#fff}.btn.p:hover{opacity:.9;color:#fff}.btn.sm{padding:5px 9px;font-size:12px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+nav{display:flex;gap:4px;overflow-x:auto;border-top:1px solid var(--bd)}
+nav button{border:0;background:none;padding:11px 14px;font-size:14px;font-weight:600;color:var(--mu);border-bottom:2px solid transparent;white-space:nowrap}
+nav button.on{color:var(--pr);border-color:var(--pr)}
+.view{display:none;padding:20px 0 70px}.view.on{display:block}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px}
+.brief{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:14px}
+.brief h3,.box h3{font-size:14px;margin-bottom:6px}.brief p,.brief li,.mu{font-size:13px;color:var(--mu)}.brief ul{padding-left:18px}
+.mixes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.mix{background:var(--ch);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--mu)}.mix b{display:block;color:var(--tx);font-size:13px}
+.fl{background:var(--bg);padding:10px 0;border-bottom:1px solid var(--bd);position:sticky;top:106px;z-index:20}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=search],input[type=number],select,input[type=text]{padding:9px 11px;border:1px solid var(--bd);border-radius:9px;background:var(--card);font-size:13px;outline:none}
+input:focus,select:focus{border-color:var(--pr)}.grow{flex:1 1 220px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pill{padding:5px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--card);font-size:12.5px;font-weight:500;color:var(--mu)}.pill.on{background:var(--pr);border-color:var(--pr);color:#fff}
+.chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--mu);cursor:pointer}
+.cnt{font-size:13px;color:var(--mu);margin:14px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:9px;transition:.15s}.card:hover{border-color:#94A3B8}
+.meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--mu);align-items:center}
+.rg{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--ch);white-space:nowrap}
+.card h4{font-size:15.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:40px}
+.price{align-self:flex-start;font-size:13px;font-weight:700;padding:3px 10px;border-radius:8px}.g{background:var(--grs);color:var(--grt)}.p{background:var(--pus);color:var(--put)}.a{background:var(--ams);color:var(--amt)}.r{background:var(--rds);color:var(--rdt)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}.chip{font-size:11px;padding:3px 8px;border-radius:6px;background:var(--ch);color:var(--mu)}
+.sum{font-size:13px;color:var(--mu);flex:1}
+.fit{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600}.fit span{padding:2px 9px;border-radius:99px}
+.bt{display:flex;gap:6px}.bt .btn{flex:1}
+.star{flex:0 0 auto!important;width:36px}.star.on{background:var(--ams);border-color:var(--amt)}
+.cmp{font-size:12px;color:var(--mu);display:flex;gap:5px;align-items:center;cursor:pointer}
+.ov{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:14px;z-index:60}.ov.on{display:flex}
+.md{background:var(--card);border:1px solid var(--bd);border-radius:16px;max-width:640px;width:100%;max-height:90vh;overflow:auto}
+.mh{padding:20px 22px 14px;border-bottom:1px solid var(--bd);position:relative}.mh h2{font-size:18px;line-height:1.3;margin:6px 34px 8px 0}
+.x{position:absolute;right:12px;top:12px;border:0;background:var(--ch);width:30px;height:30px;border-radius:8px}
+.mb{padding:4px 22px}.sec{padding:13px 0;border-bottom:1px solid var(--bd)}.sec:last-child{border:0}.sec h5{font-size:13px;margin-bottom:7px}
+.sec ul{padding-left:18px;font-size:13px;color:var(--mu)}.sec li{margin-bottom:4px}
+.ck{display:grid;gap:6px}.ck div{display:flex;gap:8px;font-size:13px;align-items:flex-start}.ck b{flex:0 0 22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px}
+.ok b{background:var(--grs);color:var(--grt)}.wn b{background:var(--ams);color:var(--amt)}.bd b{background:var(--rds);color:var(--rdt)}
+.sp{display:grid;grid-template-columns:1fr 1fr;gap:8px}.s{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--mu)}.s b{display:block;color:var(--tx);font-size:13px;font-weight:600}.s.wd{grid-column:1/-1}
+.mf{padding:12px 22px 20px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 10px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}th{color:var(--mu);font-weight:600;font-size:12px}
+.sc{overflow-x:auto}
+.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.form label{font-size:12px;color:var(--mu);display:grid;gap:3px}
+.pc{display:grid;gap:10px}.plan{display:grid;gap:10px}
+.pr{border:1px solid var(--bd);border-radius:12px;padding:12px 14px;background:var(--card)}
+.pr summary{cursor:pointer;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-weight:600;font-size:14px}
+.bar2{height:6px;background:var(--ch);border-radius:9px;overflow:hidden;margin:8px 0}.bar2 i{display:block;height:100%;background:var(--gr)}
+.tl{display:grid;gap:8px}.tl div{display:flex;gap:12px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--bd)}.tl b{flex:0 0 96px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.empty{text-align:center;color:var(--mu);padding:40px 0;grid-column:1/-1}
+@media(max-width:960px){.grid{grid-template-columns:repeat(2,1fr)}.brief,.two{grid-template-columns:1fr}.fl{top:0;position:static}}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.sp,.mixes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="w">
+ <div class="bar"><div class="logo"><i>B</i>Belgium CS &amp; Game Design Master’s Portal</div>
+ <div class="acts"><button class="btn" id="theme">🌙</button><button class="btn" id="bProfile">👤 My Profile</button><button class="btn" id="bInfo">ℹ️ How Fees Work</button><button class="btn p" id="bExport">📥 Export (.MD)</button></div></div>
+ <nav id="nav"></nav></div></header>
+
+<main class="w">
+<section class="view on" id="v-discover">
+ <div class="brief"><div class="box"><h3>Your consultant brief</h3><div id="briefTxt"></div>
+  <div class="mixes"><div class="mix"><b>Safe</b>Wallonia ARES fee (≈€1.2k/yr)</div><div class="mix"><b>Match</b>Game/graphics + HCI programs</div><div class="mix"><b>Reach</b>Master Mind &amp; Erasmus Mundus</div></div></div>
+  <div class="box"><h3>Key dates</h3><div class="tl" id="keyDates"></div></div></div>
+ <div class="fl"><div class="row"><input type="search" id="q" class="grow" placeholder="Search university, program, keyword…"><select id="sort"><option value="fit">Sort: Best fit</option><option value="fee">Sort: Lowest fee</option><option value="date">Sort: Nearest deadline</option></select><select id="budget"><option value="0">Any budget</option><option value="1500">Under €1,500/yr</option><option value="2000">Under €2,000/yr</option><option value="5000">Under €5,000/yr</option></select><select id="region"><option value="">All regions</option><option>Wallonia/Brussels</option><option>Flanders</option><option>Netherlands</option></select><label class="chk"><input type="checkbox" id="hideBlocked" checked> Hide blocked</label></div><div class="pills" id="pills"></div></div>
+ <div class="cnt" id="cnt"></div><div class="grid" id="grid"></div>
+</section>
+
+<section class="view" id="v-compare"><div class="box sc" id="cmpBox"></div></section>
+
+<section class="view" id="v-plan"><div class="two"><div><h3 style="margin-bottom:8px">My applications</h3><div class="plan" id="plan"></div></div><div><h3 style="margin-bottom:8px">Deadline timeline</h3><div class="box"><div class="tl" id="tline"></div></div></div></div></section>
+
+<section class="view" id="v-costs"><div class="box" style="margin-bottom:14px"><div class="form" id="costForm"></div><p class="mu" style="margin-top:8px">Estimates only. Living cost and insurance vary by city and provider. Funding is shown only for programs where you tick “assume funded”.</p></div><div class="box sc" id="costTbl"></div></section>
+
+<section class="view" id="v-guide"><div class="two"><div class="box"><h3>Roadmap to September 2027</h3><div class="tl" id="road"></div></div><div><div class="box" style="margin-bottom:14px"><h3>Your document checklist</h3><div class="ck" id="docs"></div></div><div class="box"><h3>Straight answers</h3><div id="faq"></div></div></div></div></section>
+</main>
+
+<div class="ov" id="ovDetail"><div class="md" id="md"></div></div>
+<div class="ov" id="ovInfo"><div class="md"><div class="mh"><button class="x" data-x>✕</button><h2>How Belgium fees work</h2></div><div class="mb"><div class="sec"><ul>
+<li><b>Wallonia/Brussels (UCLouvain, ULiège, UNamur, ULB):</b> full fee is €1,194 for 2026-27 (indexed yearly). Non-EU students pay an extra €4,175 unless their nationality is on the ARES list. Pakistan was on the 2025-26 list; confirm it is in the 2026-27 annexes before you rely on it. Income-based rates of €835, €374 or €0 exist, with the application due by 31 October each year.</li>
+<li><b>Flanders:</b> non-EU tuition is rising (University of Antwerp master’s: €5,800 → €7,800 in 2026-27). Treat Flemish programs as scholarship-dependent.</li>
+<li><b>Master Mind:</b> €10,225/yr plus tuition waiver (about €136–140 admin fee). You cannot apply directly: the university nominates you, only about 30 awards exist, and host deadlines run January–April. The 2027-28 call is under review.</li>
+<li><b>Erasmus Mundus:</b> tuition waiver plus about €1,400/month. BDMA’s EU funding ended in October 2026; its successor at ULB is DEAI. You cannot combine Erasmus Mundus with Master Mind.</li>
+<li><b>Proof of means:</b> the ~€10,000 figure is living money, not tuition. You can show it with a Belgian bank account, a scholarship letter, or an Annex 32 sponsor.</li></ul></div></div><div class="mf"><button class="btn p" data-x>Got it</button></div></div></div>
+<div class="ov" id="ovProfile"><div class="md"><div class="mh"><button class="x" data-x>✕</button><h2>My profile</h2><p class="mu">Fit scores and eligibility checks update from these values. Saved in this browser only.</p></div><div class="mb"><div class="sec"><div class="form" id="pf"></div></div></div><div class="mf"><button class="btn" id="pReset">Reset</button><button class="btn p" data-x>Done</button></div></div></div>
+
+<script>
+/* ---------- DATA ---------- */
+const P=[
+{id:1,u:"UCLouvain",c:"Louvain-la-Neuve",r:"Wallonia/Brussels",t:"MSc in Computer Science",pill:"≈€1,194 / yr",cl:"g",fee:1194,tags:["Core CS & AI","No GRE","Under €2k"],cats:["top","core"],gre:0,iel:6.5,gpa:3.0,int:4,sel:3,sum:"Strong research CS degree at the ARES-exempt rate.",
+ why:["ARES-listed nationals skip the extra €4,175 fee; full rate is €1,194 (2026-27).","UCLouvain also runs an EPL Excellence tuition scholarship (non-EU, about 31 March)."],pre:["Strong BS in CS/IT","Algorithms","OOP","Linear Algebra","Probability"],dl:"2027-03-31",est:1,tu:"≈€1,194/yr (2026-27 full rate, indexed)",af:"≈€0–€200 (verify)",url:"https://uclouvain.be/en-prog-sinfo2m"},
+{id:2,u:"UCLouvain",c:"Louvain-la-Neuve",r:"Wallonia/Brussels",t:"MSc in Data Science (Information Technology)",pill:"≈€1,194 / yr",cl:"g",fee:1194,tags:["Data & AI","No GRE","Under €2k"],cats:["top","core"],gre:0,iel:6.5,gpa:3.0,int:3,sel:3,math:20,sum:"Data science and ML at the ARES-exempt rate.",
+ why:["Same fee rule as the CS master.","Heavier on statistics, so check your math credits."],pre:["BS in CS/Math","Statistics","Calculus","Programming","Databases"],dl:"2027-03-31",est:1,tu:"≈€1,194/yr (2026-27 full rate)",af:"≈€0–€200 (verify)",url:"https://uclouvain.be/en-prog-dati2m"},
+{id:3,u:"University of Liège",c:"Liège",r:"Wallonia/Brussels",t:"MSc in Computer Science (Computer Graphics, Vision & AI)",pill:"≈€1,194 / yr",cl:"g",fee:1194,tags:["Graphics & AI","No GRE","Under €2k"],cats:["top","game"],gre:0,iel:6.0,gpa:3.0,int:5,sel:2,sum:"Graphics, vision and AI: best low-cost game-adjacent route.",
+ why:["Graphics and vision map directly to engines and XR work.","Lowest-cost route that matches your game-dev background."],pre:["BS in CS","Computer Graphics","Algorithms","C++/Python","Linear Algebra"],dl:"2027-03-31",est:1,tu:"≈€1,194/yr if ARES-exempt (verify track and language)",af:"€0 (verify)",url:"https://www.programmes.uliege.be/"},
+{id:4,u:"University of Namur",c:"Namur",r:"Wallonia/Brussels",t:"MSc in Computer Science (Software Engineering & HCI)",pill:"≈€1,194 / yr",cl:"g",fee:1194,tags:["Software & HCI","No GRE","Under €2k"],cats:["top","core"],gre:0,iel:6.0,gpa:3.0,int:4,sel:2,sum:"Small school, strong in software engineering and HCI.",
+ why:["Same ARES fee rule keeps tuition near €1.2k.","HCI and software engineering fit UX, tools and game roles."],pre:["BS in CS/SE","HCI","Software Engineering","Databases"],dl:"2027-03-31",est:1,tu:"≈€1,194/yr (2026-27 full rate)",af:"≈€150 (verify)",url:"https://www.unamur.be/en/sci/info"},
+{id:5,u:"ULB",c:"Brussels",r:"Wallonia/Brussels",t:"MSc in Cybersecurity (or Computer Science)",pill:"≈€1,194 / yr",cl:"g",fee:1194,tags:["Security","No GRE","Under €2k"],cats:["top","core"],gre:0,iel:6.0,gpa:3.0,int:3,sel:3,sum:"Brussels CS/cybersecurity; exemption depends on nationality.",
+ why:["ULB charges €1,194 plus €4,175 unless your nationality is exempt.","Security is in demand around Brussels’ EU institutions."],pre:["BS in CS","Information Security","Networks","Operating Systems"],dl:"2027-03-31",est:1,tu:"≈€1,194/yr if exempt, else ≈€5,369",af:"≈€200 (verify)",url:"https://www.ulb.be/en/programme/ma-secu"},
+{id:6,u:"Erasmus Mundus IMLEX",c:"Finland · Belgium · France · Japan",r:"Flanders",t:"Joint MSc in Imaging & Light in Extended Reality",pill:"€0 + €1,400/mo Stipend",cl:"p",fee:0,tags:["XR & Graphics","No GRE","Full Scholarship"],cats:["game","scholarship"],em:1,gre:0,iel:6.5,gpa:3.5,int:4,sel:5,math:25,sum:"Fully funded XR degree; optics-heavy, very competitive.",
+ why:["Full tuition waiver plus about €1,400/month.","KU Leuven hosts the lighting summer school; the main base is Finland and France."],pre:["BS in CS/IT","Computer Graphics","Physics/Optics","C++","Math"],dl:"2027-01-13",est:0,tu:"€0 with Erasmus Mundus scholarship",af:"€0",url:"https://imlex.org/"},
+{id:7,u:"VUB",c:"Brussels",r:"Wallonia/Brussels",t:"MSc Applied Sciences & Engineering: Computer Science (Digital Media & AI)",pill:"≈€4,200+ / yr",cl:"a",fee:4200,tags:["Media & AI","No GRE","Master Mind"],cats:["game","scholarship"],mm:1,gre:0,iel:6.5,gpa:3.5,int:5,sel:4,sum:"Digital media and AI; affordable mainly via Master Mind.",
+ why:["Master Mind brings tuition to about €140 plus a €10,225 grant if nominated.","Digital media and HCI courses suit interactive and game work."],pre:["BS in CS","Multimedia","HCI","Web/Mobile Dev","AI"],dl:"2027-04-01",est:1,tu:"≈€4,200+/yr (2025-26 figure, Flemish non-EU fees are rising)",af:"€0 (verify)",url:"https://www.vub.be/en/studying-at-vub/all-study-programmes-at-vub/bachelors-and-masters-programmes-at-vub/applied-sciences-and-engineering-computer-science"},
+{id:8,u:"LUCA School of Arts",c:"Genk",r:"Flanders",t:"Master of Game Design / Audiovisual Arts",pill:"≈€7,000+ / yr",cl:"a",fee:7000,tags:["Game Design","Portfolio","Master Mind"],cats:["game"],mm:1,port:1,gre:0,iel:6.0,gpa:3.3,int:5,sel:4,sum:"Arts-school game design; portfolio and interview decide.",
+ why:["Pure game-design focus; your shipped games are your strongest asset.","Master Mind can cut tuition sharply but is competitive."],pre:["Game dev portfolio","3D Graphics/Animation","Unity/Unreal prototype","Interview"],dl:"2027-03-01",est:1,tu:"≈€7,000+/yr self-funded (verify 2027-28)",af:"≈€75 (verify)",url:"https://www.luca-arts.be/en"},
+{id:9,u:"Utrecht University",c:"Utrecht, NL",r:"Netherlands",t:"MSc in Game and Media Technology",pill:"€0 with Scholarship",cl:"p",fee:20000,tags:["Game Tech","No GRE","Benchmark"],cats:["game","scholarship"],gre:0,iel:6.5,band:6.0,gpa:3.5,int:5,sel:5,sum:"Dutch benchmark for game tech; free only with a scholarship.",
+ why:["One of the best game-tech masters in the region, a useful comparison.","Full fee is over €20k, so the scholarship is essential."],pre:["BS in CS","Physics Engines","3D Graphics","AI for Games","Linear Algebra"],dl:"2027-01-15",est:1,tu:"€0 only with Utrecht Excellence Scholarship; otherwise over €20k",af:"≈€100 (verify)",url:"https://www.uu.nl/en/masters/game-and-media-technology"},
+{id:10,u:"ULB (Erasmus Mundus DEAI)",c:"Brussels + partners",r:"Wallonia/Brussels",t:"Joint MSc in Data Engineering & AI (successor to BDMA)",pill:"€0 + €1,400/mo Stipend",cl:"p",fee:0,tags:["Data & AI","No GRE","Full Scholarship"],cats:["core","scholarship"],em:1,gre:0,iel:6.5,gpa:3.3,int:3,sel:5,math:20,sum:"Fully funded data/AI joint degree; replaces BDMA.",
+ why:["BDMA’s EU funding ended in October 2026; DEAI is the new Erasmus Mundus program.","Full waiver plus monthly stipend if selected."],pre:["BS in CS","Databases","Data Structures","Probability & Statistics"],dl:null,est:1,tu:"€0 with Erasmus Mundus scholarship",af:"€0 (verify)",url:"https://bdma.ulb.ac.be/"},
+{id:11,u:"Hasselt University",c:"Hasselt",r:"Flanders",t:"MSc in Statistics & Data Science",pill:"≈€2,700+ / yr",cl:"a",fee:2699,tags:["Data Science","No GRE","Master Mind"],cats:["core","scholarship"],mm:1,gre:0,iel:6.5,gpa:3.5,int:2,sel:3,math:30,sum:"Affordable Flemish data science; stats-heavy.",
+ why:["Master Mind brings tuition to about €140 plus the grant.","Needs strong statistics, which is your thinnest area."],pre:["BS in CS/Math","Probability & Statistics","Linear Algebra","Programming"],dl:"2027-03-15",est:1,tu:"from ≈€2,699/yr (older figure; 2026-27 has new non-EEA categories)",af:"€0",url:"https://www.uhasselt.be/en/study/programmes/master-of-statistics-and-data-science"},
+{id:12,u:"University of Antwerp",c:"Antwerp",r:"Flanders",t:"MSc in Computer Science (Software Engineering / Data Science)",pill:"€7,800 / yr",cl:"a",fee:7800,tags:["Software & Data","No GRE","Master Mind"],cats:["core","scholarship"],mm:1,gre:0,iel:6.5,gpa:3.5,int:3,sel:4,sum:"Research-oriented CS; affordable only through Master Mind.",
+ why:["Non-EU master’s tuition rose to €7,800 in 2026-27.","Master Mind (host deadline about 1 Feb) drops it to about €140."],pre:["Research-oriented BS in CS","Algorithms","Distributed Systems","Software Engineering"],dl:"2027-02-01",est:1,tu:"€7,800/yr (2026-27); about €140 with Master Mind",af:"€0",url:"https://www.uantwerpen.be/en/study/programmes/all-programmes/master-software-engineering/"}
+];
+const CATS=[["all","All Programs"],["top","🔥 Top Priority (<€2k/yr)"],["game","🎮 Game Design & Graphics"],["core","💻 Core CS, AI & Data"],["scholarship","🏆 Full Scholarship Possible"]];
+const STAT=["Researching","Preparing","Applied","Offer","Rejected"];
+const TASKS=["Eligibility checked","IELTS report ready","Transcript + degree (HEC + apostille)","CV and motivation letter","2 reference letters","Portfolio / project links","Application submitted","Scholarship form (if any)","Visa D documents"];
+const DOCS=["Passport (valid 18+ months)","Degree + transcript, HEC attested, MOFA apostille","IELTS Academic report (6.5, speaking 6.0)","MOI certificate from your university (you don’t have one yet: request it)","CV (Europass) + motivation letter per program","2 academic or employer reference letters (Euphoria XR letter helps)","Portfolio: 3–5 shipped games, builds, short videos, GitHub","Course syllabi / module descriptions PDF","Police clearance + medical certificate (visa D, verify with embassy)","Proof of means: Annex 32 sponsor, scholarship letter or Belgian bank account"];
+const ROAD=[["Now – Dec 2026","Shortlist 6–8 programs (2 safe, 3 match, 2 reach). Request MOI + syllabi from your university. Get apostille done. Ask referees."],["13 Jan 2027","IMLEX deadline (Erasmus Mundus). Check DEAI at ULB and KU Leuven Master Mind host deadline."],["Feb – Mar 2027","Antwerp Master Mind (≈1 Feb), LUCA portfolio (≈1 Mar), Hasselt Master Mind (15 Mar), Wallonia programs (≈31 Mar). Verify every date."],["Apr 2027","VUB / Ghent Master Mind (≈1 Apr). Erasmus Mundus results mid-April."],["May – Jun 2027","Accept offer. Arrange Annex 32 sponsor or funds. Book visa appointment early."],["Jun – Aug 2027","Visa D application (Belgian embassy / authorised center). Housing, insurance, flights."],["Sep 2027","Arrive. Register at the commune within 8 days, then residence card."]];
+const KEY=[["1 Dec 2026","h_da Darmstadt portfolio + uni-assist (Germany, parallel)"],["13 Jan 2027","IMLEX Erasmus Mundus"],["≈1 Feb 2027","Antwerp Master Mind"],["15 Mar 2027","Hasselt Master Mind"],["≈31 Mar 2027","UCLouvain, ULiège, UNamur, ULB (verify)"]];
+const FAQ=[["Can anyone guarantee admission?","No. A good strategy raises your odds: apply to a mix of safe, match and reach programs, and send complete files early."],["Why Sept 2027, not summer?","Belgian master’s programs start in September. A Feb 2027 start is rare and its deadlines are mostly gone."],["Is IELTS 6.5 enough?","For most programs here, yes. Check each band minimum: your speaking is 6.0. Master Mind hosts may ask for more."],["Can I do Germany and Belgium together?","Yes. Your h_da deadline (1 Dec) comes first, and Belgian deadlines start in January."],["Wallonia vs Flanders?","Wallonia is cheapest for you if Pakistan stays on the ARES list. Flanders now depends on Master Mind, which is very selective."]];
+
+/* ---------- STATE ---------- */
+const DEF={cgpa:3.75,ielts:6.5,band:6.0,gre:0,math:15,port:1,budget:2000};
+let S={prof:{...DEF},star:[],cmp:[],stat:{},task:{},docs:{},cost:{live:900,ins:50,one:600,fund:{}},view:"discover",cat:"all",theme:null};
+try{const x=JSON.parse(localStorage.getItem("bmp")||"null");if(x)S={...S,...x,prof:{...DEF,...x.prof},cost:{...S.cost,...x.cost}};}catch(e){}
+const save=()=>{try{localStorage.setItem("bmp",JSON.stringify(S));}catch(e){}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const E=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const eur=n=>"€"+Math.round(n).toLocaleString("en-US");
+const days=d=>Math.ceil((new Date(d+"T23:59:00")-new Date())/864e5);
+const fmtD=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+
+/* ---------- FIT ENGINE ---------- */
+function checks(p){
+ const f=S.prof,o=[];
+ o.push(p.gre&&!f.gre?["bd","Test","GRE required and you have none"]:["ok","Test","No GRE needed"]);
+ if(f.ielts<p.iel)o.push(["bd","English","Needs IELTS "+p.iel+"; you have "+f.ielts]);
+ else if(p.band&&f.band<p.band)o.push(["wn","English","Needs "+p.band+" in each band; your lowest is "+f.band]);
+ else o.push(["ok","English","IELTS "+p.iel+" met (no MOI on file; verify band minimums)"]);
+ if(p.fee<=f.budget)o.push(["ok","Budget",p.pill+" is within "+eur(f.budget)+"/yr"]);
+ else if(p.cats.includes("scholarship"))o.push(["wn","Budget","Over budget unless you win a scholarship"]);
+ else o.push(["bd","Budget",p.pill+" exceeds "+eur(f.budget)+"/yr"]);
+ if(p.math&&f.math<p.math)o.push(["wn","Subject","Wants about "+p.math+" math/stats credits; you have "+f.math]);
+ else o.push(["ok","Subject","Your CS, graphics and game credits fit"]);
+ if(p.port)o.push(f.port?["ok","Portfolio","Required: your shipped games qualify"]:["bd","Portfolio","Portfolio required"]);
+ o.push(f.cgpa>=p.gpa?["ok","Grades","CGPA "+f.cgpa+" meets the usual "+p.gpa+"+"]:["wn","Grades","Usual bar is "+p.gpa+"+; you have "+f.cgpa]);
+ if(p.sel>=4)o.push(["wn","Competition","Highly selective: treat as a reach"]);
+ return o;}
+function fit(p){
+ const c=checks(p);let s=62+p.int*5;
+ c.forEach(x=>{if(x[0]==="wn")s-=9;if(x[0]==="bd")s-=40;});
+ s=Math.max(5,Math.min(98,s-(p.sel-3)*3));
+ const bad=c.some(x=>x[0]==="bd");
+ return {s:Math.round(s),bad,l:bad?"Blocked":s>=78?"Strong fit":s>=62?"Good fit":"Stretch",cl:bad?"r":s>=78?"g":s>=62?"p":"a"};}
+
+/* ---------- DISCOVER ---------- */
+function filt(){
+ const q=$("#q").value.trim().toLowerCase(),b=+$("#budget").value,rg=$("#region").value,hb=$("#hideBlocked").checked;
+ let l=P.filter(p=>{
+  if(S.cat!=="all"&&!p.cats.includes(S.cat))return false;
+  if(b&&p.fee>=b)return false;if(rg&&p.r!==rg)return false;if(hb&&fit(p).bad)return false;
+  if(q&&![p.u,p.c,p.t,p.sum,p.tags.join(" "),p.pre.join(" ")].join(" ").toLowerCase().includes(q))return false;return true;});
+ const so=$("#sort").value;
+ l.sort((a,b)=>so==="fee"?a.fee-b.fee:so==="date"?(a.dl||"9").localeCompare(b.dl||"9"):fit(b).s-fit(a).s);return l;}
+function renderDiscover(){
+ $("#pills").innerHTML=CATS.map(([k,l])=>`<button class="pill ${S.cat===k?"on":""}" data-cat="${k}">${l}</button>`).join("");
+ const l=filt();$("#cnt").textContent=l.length+" of "+P.length+" programs · "+S.star.length+" shortlisted";
+ $("#grid").innerHTML=l.length?l.map(p=>{const f=fit(p);return `<article class="card">
+  <div class="meta"><span>${E(p.u)} · ${E(p.c)}</span><span class="rg">${E(p.r)}</span></div>
+  <h4>${E(p.t)}</h4><span class="price ${p.cl}">${E(p.pill)}</span>
+  <div class="chips">${p.tags.map(t=>`<span class="chip">${E(t)}</span>`).join("")}</div>
+  <p class="sum">${E(p.sum)}</p>
+  <div class="fit"><span class="${f.cl}">${f.l} · ${f.s}</span><label class="cmp"><input type="checkbox" data-cmp="${p.id}" ${S.cmp.includes(p.id)?"checked":""}>Compare</label></div>
+  <div class="bt"><button class="btn" data-open="${p.id}">Quick Details</button><a class="btn p" href="${p.url}" target="_blank" rel="noopener">Visit Site ↗</a><button class="btn star ${S.star.includes(p.id)?"on":""}" data-star="${p.id}" title="Add to my plan">${S.star.includes(p.id)?"★":"☆"}</button></div></article>`}).join(""):`<div class="empty">No programs match. Loosen the filters or show blocked programs.</div>`;
+ const top=P.filter(p=>!fit(p).bad).sort((a,b)=>fit(b).s-fit(a).s).slice(0,3);
+ $("#briefTxt").innerHTML=`<p>Top matches for your profile (CGPA ${S.prof.cgpa}, IELTS ${S.prof.ielts}, no GRE): <b>${top.map(p=>E(p.u)).join(", ")}</b>.</p><ul style="margin-top:6px"><li>Apply to 6–8 programs: low-cost Wallonia first, scholarships as reaches.</li><li>Nobody can promise admission; complete files sent early are what you control.</li><li>Dates marked “est.” need checking on the official page.</li></ul>`;
+ $("#keyDates").innerHTML=KEY.map(k=>`<div><b>${k[0]}</b><span>${E(k[1])}</span></div>`).join("");}
+
+/* ---------- DETAILS ---------- */
+function openDetail(id){
+ const p=P.find(x=>x.id===id),f=fit(p),ic={ok:"✓",wn:"!",bd:"✕"};
+ $("#md").innerHTML=`<div class="mh"><button class="x" data-x>✕</button><div class="meta"><span>${E(p.u)} · ${E(p.c)}</span><span class="rg">${E(p.r)}</span></div><h2>${E(p.t)}</h2><span class="price ${p.cl}">${E(p.pill)}</span> <span class="price ${f.cl}">${f.l} · ${f.s}</span></div>
+ <div class="mb"><div class="sec"><h5>Eligibility check against your profile</h5><div class="ck">${checks(p).map(c=>`<div class="${c[0]}"><b>${ic[c[0]]}</b><span><b style="all:unset;font-weight:600">${c[1]}:</b> ${E(c[2])}</span></div>`).join("")}</div></div>
+ <div class="sec"><h5>Why it’s recommended</h5><ul>${p.why.map(w=>`<li>${E(w)}</li>`).join("")}</ul></div>
+ <div class="sec"><h5>Required CS background</h5><div class="chips">${p.pre.map(t=>`<span class="chip">${E(t)}</span>`).join("")}</div></div>
+ <div class="sec"><h5>Deadlines &amp; specs</h5><div class="sp"><div class="s">Tuition<b>${E(p.tu)}</b></div><div class="s">Application fee<b>${E(p.af)}</b></div><div class="s">Deadline (Sept 2027 intake)<b>${p.dl?fmtD(p.dl)+(p.est?" (est.)":"")+" · "+(days(p.dl)>0?days(p.dl)+" days left":"passed"):"Not published yet, check site"}</b></div><div class="s">IELTS<b>${p.iel} overall${p.band?", "+p.band+" each band":""}</b></div><div class="s wd">Proof of means<b>About €800–€1,000/month: Annex 32 sponsor, scholarship letter or Belgian bank account</b></div></div><p class="mu" style="margin-top:8px">Confirm every figure on the official page before applying.</p></div></div>
+ <div class="mf"><button class="btn" data-star="${p.id}">${S.star.includes(p.id)?"★ In my plan":"☆ Add to my plan"}</button><a class="btn p" href="${p.url}" target="_blank" rel="noopener">Visit Official Course Website ↗</a></div>`;
+ $("#ovDetail").classList.add("on");}
+
+/* ---------- COMPARE ---------- */
+function renderCompare(){
+ const l=S.cmp.map(i=>P.find(p=>p.id===i)).filter(Boolean);
+ if(!l.length){$("#cmpBox").innerHTML=`<p class="empty">Tick “Compare” on up to 3 program cards to see them side by side.</p>`;return;}
+ const R=[["Program",p=>E(p.t)],["Region",p=>E(p.r)],["Price",p=>`<span class="price ${p.cl}">${E(p.pill)}</span>`],["Your fit",p=>{const f=fit(p);return `<span class="price ${f.cl}">${f.l} · ${f.s}</span>`}],["Blockers / warnings",p=>checks(p).filter(c=>c[0]!=="ok").map(c=>E(c[2])).join("<br>")||"None"],["IELTS",p=>p.iel+(p.band?" / "+p.band:"")],["Deadline",p=>p.dl?fmtD(p.dl)+(p.est?" (est.)":""):"TBA"],["App fee",p=>E(p.af)],["Funding route",p=>p.em?"Erasmus Mundus":p.mm?"Master Mind":p.fee<=2000?"ARES low fee":"Self-funded"],["Prerequisites",p=>p.pre.join(", ")],["Link",p=>`<a href="${p.url}" target="_blank" rel="noopener">Official site ↗</a>`]];
+ $("#cmpBox").innerHTML=`<table><tr><th></th>${l.map(p=>`<th>${E(p.u)}</th>`).join("")}</tr>${R.map(r=>`<tr><th>${r[0]}</th>${l.map(p=>`<td>${r[1](p)}</td>`).join("")}</tr>`).join("")}</table>`;}
+
+/* ---------- PLAN ---------- */
+function prog(id){const t=S.task[id]||[];return Math.round(t.length/TASKS.length*100);}
+function renderPlan(){
+ const l=S.star.map(i=>P.find(p=>p.id===i)).filter(Boolean);
+ $("#plan").innerHTML=l.length?l.map(p=>`<details class="pr"><summary><span>${E(p.u)}: ${E(p.t.length>46?p.t.slice(0,46)+"…":p.t)}</span><span class="row"><select data-stat="${p.id}">${STAT.map(s=>`<option ${((S.stat[p.id]||"Researching")===s)?"selected":""}>${s}</option>`).join("")}</select><span class="mu">${prog(p.id)}%</span></span></summary><div class="bar2"><i style="width:${prog(p.id)}%"></i></div><div class="ck">${TASKS.map((t,i)=>`<label class="chk"><input type="checkbox" data-task="${p.id}:${i}" ${(S.task[p.id]||[]).includes(i)?"checked":""}> ${t}</label>`).join("")}</div><p style="margin-top:8px"><button class="btn sm" data-star="${p.id}">Remove from plan</button> <a class="btn sm" href="${p.url}" target="_blank" rel="noopener">Official site ↗</a></p></details>`).join(""):`<div class="box empty">Tap ☆ on any program to add it here and track your application.</div>`;
+ const d=l.filter(p=>p.dl).sort((a,b)=>a.dl.localeCompare(b.dl));
+ $("#tline").innerHTML=d.length?d.map(p=>{const n=days(p.dl);return `<div><b>${fmtD(p.dl)}${p.est?"*":""}</b><span>${E(p.u)} <span class="mu">· ${n>0?n+" days":"passed"}</span></span></div>`}).join("")+`<p class="mu">* estimated, verify on the official site</p>`:`<p class="mu">Your shortlisted deadlines appear here.</p>`;}
+
+/* ---------- COSTS ---------- */
+function renderCosts(){
+ const c=S.cost;
+ $("#costForm").innerHTML=[["live","Living €/month"],["ins","Insurance €/month"],["one","One-off (visa, flights, deposit) €"]].map(([k,l])=>`<label>${l}<input type="number" min="0" step="50" data-cost="${k}" value="${c[k]}"></label>`).join("");
+ const l=(S.star.length?S.star:P.filter(p=>!fit(p).bad).map(p=>p.id)).map(i=>P.find(p=>p.id===i));
+ $("#costTbl").innerHTML=`<table><tr><th>Program</th><th>Tuition</th><th>Living+insurance</th><th>One-off</th><th>Funding</th><th>Year 1 net</th></tr>${l.map(p=>{
+  const fund=c.fund[p.id]?(p.em?16800:p.mm?10225:0):0,tu=c.fund[p.id]&&(p.mm||p.em)?(p.em?0:140):p.fee,liv=(c.live+c.ins)*12,tot=tu+liv+c.one-fund;
+  return `<tr><td>${E(p.u)}<br><span class="mu">${E(p.pill)}</span></td><td>${eur(tu)}</td><td>${eur(liv)}</td><td>${eur(c.one)}</td><td>${p.em||p.mm?`<label class="chk"><input type="checkbox" data-fund="${p.id}" ${c.fund[p.id]?"checked":""}>assume funded (${eur(p.em?16800:10225)})</label>`:"-"}</td><td><b>${eur(tot)}</b></td></tr>`}).join("")}</table>${S.star.length?"":`<p class="mu" style="margin-top:8px">Showing all non-blocked programs. Shortlist some to narrow this table.</p>`}`;}
+
+/* ---------- GUIDE ---------- */
+function renderGuide(){
+ $("#road").innerHTML=ROAD.map(r=>`<div><b>${r[0]}</b><span>${E(r[1])}</span></div>`).join("");
+ $("#docs").innerHTML=DOCS.map((d,i)=>`<label class="chk"><input type="checkbox" data-doc="${i}" ${S.docs[i]?"checked":""}> ${E(d)}</label>`).join("");
+ $("#faq").innerHTML=FAQ.map(f=>`<p style="margin-bottom:10px"><b style="font-size:13px">${E(f[0])}</b><br><span class="mu">${E(f[1])}</span></p>`).join("");}
+
+/* ---------- PROFILE ---------- */
+function renderProfile(){
+ const f=S.prof,F=[["cgpa","CGPA (of 4.0)",0.05],["ielts","IELTS overall",0.5],["band","IELTS lowest band",0.5],["math","Math/stats credits",1],["budget","Max tuition €/yr",100]];
+ $("#pf").innerHTML=F.map(([k,l,s])=>`<label>${l}<input type="number" step="${s}" data-pf="${k}" value="${f[k]}"></label>`).join("")+`<label class="chk"><input type="checkbox" data-pfc="gre" ${f.gre?"checked":""}> I have a GRE score</label><label class="chk"><input type="checkbox" data-pfc="port" ${f.port?"checked":""}> I have a game portfolio</label>`;}
+
+/* ---------- EXPORT ---------- */
+function md(){
+ const l=filt().length?filt():P,f=S.prof;
+ let m="# Belgium CS & Game Design Master's Guide\n\n## Executive Summary\n\n";
+ m+=`- **Profile used:** CGPA ${f.cgpa}/4.0, IELTS ${f.ielts} (lowest band ${f.band}), GRE: ${f.gre?"yes":"none"}, budget ${eur(f.budget)}/yr.\n`;
+ m+="- **Low-cost route:** Wallonia-Brussels programs cost about €1,194/yr (2026-27 full rate). The extra €4,175 non-EU fee is waived for nationals on the ARES list (Pakistan was listed in 2025-26; verify the 2026-27 annex).\n";
+ m+="- **Funded routes:** Master Mind (€10,225/yr + tuition waiver, nominated by the host, very selective) and Erasmus Mundus (tuition waiver + about €1,400/month).\n";
+ m+="- **Intake:** September 2027. Dates marked est. must be verified. Nobody can guarantee admission; apply to a mix of safe, match and reach programs.\n\n";
+ m+="## Comparison Table\n\n| University | Program | Region | Price | Fit | Deadline |\n|---|---|---|---|---|---|\n";
+ l.forEach(p=>{const x=fit(p);m+=`| ${p.u} | ${p.t} | ${p.r} | ${p.pill} | ${x.l} (${x.s}) | ${p.dl?p.dl+(p.est?" est.":""):"TBA"} |\n`;});
+ m+="\n## Program Details\n\n";
+ l.forEach((p,i)=>{m+=`### ${i+1}. ${p.u}: ${p.t}\n\n- **Tuition:** ${p.tu}\n- **Application fee:** ${p.af}\n- **Deadline:** ${p.dl?p.dl+(p.est?" (est.)":""):"TBA"}\n- **IELTS:** ${p.iel}${p.band?" / "+p.band+" each":""}\n- **Prerequisites:** ${p.pre.join(", ")}\n- **Checks:** ${checks(p).map(c=>({ok:"OK",wn:"Warning",bd:"Blocked"}[c[0]])+" - "+c[2]).join("; ")}\n- **URL:** ${p.url}\n\n`;});
+ m+="## Roadmap\n\n"+ROAD.map(r=>`- **${r[0]}:** ${r[1]}`).join("\n")+"\n\n## Document Checklist\n\n"+DOCS.map(d=>"- [ ] "+d).join("\n")+"\n\n_Fees and dates change yearly. Verify on each official page._\n";
+ return m;}
+
+/* ---------- WIRING ---------- */
+const VIEWS=[["discover","Discover"],["compare","Compare"],["plan","My Plan"],["costs","Costs"],["guide","Guide"]];
+function go(v){S.view=v;$$(".view").forEach(e=>e.classList.toggle("on",e.id==="v-"+v));
+ $("#nav").innerHTML=VIEWS.map(([k,l])=>`<button class="${k===v?"on":""}" data-v="${k}">${l}${k==="plan"&&S.star.length?" ("+S.star.length+")":""}${k==="compare"&&S.cmp.length?" ("+S.cmp.length+")":""}</button>`).join("");
+ ({discover:renderDiscover,compare:renderCompare,plan:renderPlan,costs:renderCosts,guide:renderGuide})[v]();save();}
+const tog=(a,v,max)=>{const i=a.indexOf(v);if(i>-1)a.splice(i,1);else{if(max&&a.length>=max)a.shift();a.push(v);}};
+document.addEventListener("click",e=>{
+ const t=e.target,g=a=>t.closest("["+a+"]");
+ if(g("data-x")||t.classList.contains("ov")){$$(".ov").forEach(o=>o.classList.remove("on"));return;}
+ let b;
+ if(b=g("data-v"))go(b.dataset.v);
+ else if(b=g("data-cat")){S.cat=b.dataset.cat;go("discover");}
+ else if(b=g("data-open"))openDetail(+b.dataset.open);
+ else if(b=g("data-star")){tog(S.star,+b.dataset.star);const o=$("#ovDetail").classList.contains("on");go(S.view);if(o)openDetail(+b.dataset.star);}
+});
+document.addEventListener("change",e=>{
+ const t=e.target,d=t.dataset;
+ if(d.cmp){tog(S.cmp,+d.cmp,3);go("discover");}
+ else if(d.stat){S.stat[d.stat]=t.value;save();}
+ else if(d.task){const[i,k]=d.task.split(":").map(Number);const a=S.task[i]=S.task[i]||[];tog(a,k);go("plan");$$("details.pr").forEach(x=>{});}
+ else if(d.doc){S.docs[d.doc]=t.checked;save();}
+ else if(d.cost){S.cost[d.cost]=+t.value||0;go("costs");}
+ else if(d.fund){S.cost.fund[d.fund]=t.checked;go("costs");}
+ else if(d.pf){S.prof[d.pf]=+t.value;save();go(S.view);}
+ else if(d.pfc){S.prof[d.pfc]=t.checked?1:0;save();go(S.view);}
+ else if(["budget","sort","region","hideBlocked"].includes(t.id))renderDiscover();
+});
+$("#q").addEventListener("input",renderDiscover);
+$("#bInfo").onclick=()=>$("#ovInfo").classList.add("on");
+$("#bProfile").onclick=()=>{renderProfile();$("#ovProfile").classList.add("on");};
+$("#pReset").onclick=()=>{S.prof={...DEF};renderProfile();go(S.view);};
+$("#bExport").onclick=()=>{const u=URL.createObjectURL(new Blob([md()],{type:"text/markdown;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download="Belgium_CS_GameDesign_Masters_Guide.md";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$$(".ov").forEach(o=>o.classList.remove("on"));});
+function theme(d){document.documentElement.dataset.theme=d?"dark":"light";$("#theme").textContent=d?"☀️":"🌙";S.theme=d;save();}
+$("#theme").onclick=()=>theme(document.documentElement.dataset.theme!=="dark");
+theme(S.theme===null?(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches):S.theme);
+go(S.view);
+</script>
+</body>
+</html>
