@@ -3,7 +3,7 @@
  * Powered by Groq API with # mention popover, official Belgian legal citations, and resizable window.
  */
 
-import { UNIVERSITIES, BELGIUM_DOMAINS, SAMPLE_QUESTIONS } from './data.js';
+import { UNIVERSITIES, BELGIUM_DOMAINS, GERMANY_DOMAINS, SAMPLE_QUESTIONS } from './data.js';
 
 const DEFAULT_GROQ_KEY = "";
 const PRIMARY_MODEL = "openai/gpt-oss-120b";
@@ -345,9 +345,11 @@ export class BelgiumAiAgent {
   showMentionPopover(query, hashIndex) {
     const matched = UNIVERSITIES.filter(u =>
       u.u.toLowerCase().includes(query) ||
+      u.name.toLowerCase().includes(query) ||
       u.t.toLowerCase().includes(query) ||
       u.c.toLowerCase().includes(query) ||
-      u.tags.some(t => t.toLowerCase().includes(query))
+      (u.country && u.country.toLowerCase().includes(query)) ||
+      (u.tags && u.tags.some(t => t.toLowerCase().includes(query)))
     );
 
     if (matched.length === 0) {
@@ -355,15 +357,43 @@ export class BelgiumAiAgent {
       return;
     }
 
-    this.mentionList.innerHTML = matched.map((u, i) => `
-      <div class="ai-mention-item ${i === 0 ? "active" : ""}" data-id="${u.id}">
+    const germanUnis = matched.filter(u => u.country === "Germany");
+    const belgianUnis = matched.filter(u => u.country === "Belgium");
+    const otherUnis = matched.filter(u => u.country !== "Germany" && u.country !== "Belgium");
+
+    let html = "";
+
+    const renderItem = (u) => `
+      <div class="ai-mention-item" data-id="${u.id}">
         <div class="ai-mention-top">
-          <b>${u.u}</b>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:13px;">${u.country === 'Germany' ? '🇩🇪' : u.country === 'Belgium' ? '🇧🇪' : '🇪🇺'}</span>
+            <b>${u.u}</b>
+          </div>
           <span class="ai-mention-fee ${u.cl}">${u.pill}</span>
         </div>
-        <div class="ai-mention-title">${u.t} · ${u.c}</div>
+        <div class="ai-mention-title">${u.t} · ${u.c} (${u.appRoute || 'Direct'})</div>
       </div>
-    `).join("");
+    `;
+
+    if (germanUnis.length > 0) {
+      html += `<div class="ai-mention-group-header">🇩🇪 Germany Programs (${germanUnis.length})</div>`;
+      html += germanUnis.map(renderItem).join("");
+    }
+    if (belgianUnis.length > 0) {
+      html += `<div class="ai-mention-group-header">🇧🇪 Belgium Programs (${belgianUnis.length})</div>`;
+      html += belgianUnis.map(renderItem).join("");
+    }
+    if (otherUnis.length > 0) {
+      html += `<div class="ai-mention-group-header">🇪🇺 European Joint &amp; Other (${otherUnis.length})</div>`;
+      html += otherUnis.map(renderItem).join("");
+    }
+
+    this.mentionList.innerHTML = html;
+
+    // Set first item active
+    const firstItem = this.mentionList.querySelector(".ai-mention-item");
+    if (firstItem) firstItem.classList.add("active");
 
     this.mentionList.querySelectorAll(".ai-mention-item").forEach(item => {
       item.addEventListener("click", () => {
@@ -371,12 +401,12 @@ export class BelgiumAiAgent {
         const uni = UNIVERSITIES.find(u => u.id === id);
         if (uni) {
           this.setUniversityContext(uni);
-          // Replace query with university tag or clear hash
+          // Replace query with university tag
           const text = this.input.value;
           const cursorPos = this.input.selectionStart;
           const before = text.slice(0, hashIndex);
           const after = text.slice(cursorPos);
-          this.input.value = `${before}#[${uni.u}: ${uni.t}] ${after}`;
+          this.input.value = `${before}#[${uni.country === 'Germany' ? '🇩🇪 ' : '🇧🇪 '}${uni.u}: ${uni.t}] ${after}`;
           this.input.focus();
         }
         this.mentionPopover.classList.add("hidden");
@@ -802,53 +832,51 @@ export class BelgiumAiAgent {
 
   buildSystemPrompt() {
     const uniList = UNIVERSITIES.map(u => (
-      `- ${u.u} (${u.name}), City: ${u.c}, Region: ${u.r}, Program: ${u.t}, Tuition: ${u.pill} (Standard non-EU: €${u.nonEuStandardFee}/yr, ARES eligible: €${u.statutoryFee}/yr), Application fee: ${u.appFee}, IELTS: ${u.iel} (band ${u.band || "none"}), GRE: ${u.gre ? "Required" : "Not Required"}, Math requirement: ${u.mathReq} semester credits (~${u.mathEcts} ECTS), Deadline: ${u.dl || "TBA"}. URL: ${u.url}`
+      `- [${u.country || "Belgium"}] ${u.u} (${u.name}), City: ${u.c}, Region/State: ${u.r}, Program: ${u.t}, Tuition: ${u.pill} (Standard non-EU: €${u.nonEuStandardFee || u.fee}/yr, Statutory/ARES: €${u.statutoryFee || u.fee}/yr), App Route: ${u.appRoute || "Direct"}, Status: ${u.appStatus || "Open"}, IELTS: ${u.iel} (band ${u.band || "none"}), German: ${u.germanReq || "None"}, GRE: ${u.gre ? "Required" : "Not Required"}, Math ECTS: ~${u.mathEcts || 30}, CS ECTS: ~${u.csEcts || 40}, Deadline: ${u.dl || "TBA"}. URL: ${u.url}`
     )).join("\n");
 
     const domains = `
-    BELGIAN HIGHER EDUCATION & VISA GROUND-TRUTH FACTS:
-    1. Wallonia-Brussels Federation (ARES Exemption):
+    EUROPEAN HIGHER EDUCATION & VISA GROUND-TRUTH FACTS (BELGIUM & GERMANY):
+    1. Germany Tuition-Free Higher Education:
+       - 15 out of 16 German federal states charge €0 tuition for consecutive Master's degrees at public universities.
+       - Students only pay a semester contribution (Semesterbeitrag) of ~€85 to €350, which almost always includes a free Semesterticket (unlimited regional train/bus transit).
+       - Exception: Baden-Württemberg (e.g. University of Stuttgart, Freiburg) charges non-EU students €1,500/semester (€3,000/year).
+       - uni-assist & VPD: Many German universities (TUM, Passau, etc.) require Vorprüfungsdokumentation (VPD) through uni-assist before direct application. Costs: €75 first uni, €30 each subsequent.
+       - German Visa Solvency (Sperrkonto / Blocked Account): Statutory minimum €992/month = €11,904/academic year for 2026/2027 (via Expatrio, Fintiba, Coracle). Returned monthly upon arrival.
+       - Post-Study Work Visa: 18-Month Jobseeker permit (Aufenthaltserlaubnis) with transition to EU Blue Card and fast-track PR in 21–27 months.
+       - Student Work Rights: 140 full days or 280 half days per calendar year (up to 20 hours/week).
+
+    2. Wallonia-Brussels Federation (ARES Exemption):
        - Legal Basis: Wallonia-Brussels Higher Education Decree on student assimilation.
-       - Rule: Non-EU students who are nationals of developing countries (listed in the DAC/OECD list of ODA recipients and approved in the annual ARES circular) are exempt from the extra non-EU tuition surcharge of €4,175.
-       - Cost: They pay the statutory base fee of approximately €835 to €1,194/year (2026-2027 full indexed rate is €1,194). Income-based waivers down to €0 or €374 exist upon application before Oct 31.
-       - Applicable Universities: UCLouvain (Louvain-la-Neuve), University of Liège (ULiège), University of Namur (UNamur), Université libre de Bruxelles (ULB).
-       - Pakistan was listed in the 2025-26 circular; applicants should verify the annual 2026-27 circular annex.
+       - Rule: Non-EU students who are nationals of developing countries (listed in the DAC/OECD list of ODA recipients, e.g. Pakistan) are exempt from the extra non-EU tuition surcharge of €4,175.
+       - Cost: They pay the statutory base fee of approximately €835 to €1,194/year (2026-2027 full indexed rate is €1,194).
+       - Applicable Universities: UCLouvain, University of Liège (ULiège), University of Namur (UNamur), Université libre de Bruxelles (ULB).
 
-    2. Flemish Higher Education (Flanders):
-       - Legal Basis: Codex Hoger Onderwijs.
-       - Non-EEA tuition has been deregulated and indexed: University of Antwerp Master in CS is €7,800/yr (2026-27), VUB is ~€4,200 - €5,800/yr, KU Leuven is ~€4,200 - €7,000/yr, Hasselt is ~€2,699 - €3,900/yr.
-       - Flemish Master Mind Scholarship (VLUHR): Award of €10,225/academic year + full tuition waiver (student pays only ~€139.40 - €145 registration fee). Requirements: 3.5+ CGPA and IELTS 7.0 or high 6.5. Candidates must be nominated by the university (host deadlines run Jan 15 - April 1).
+    3. Flemish Higher Education (Flanders):
+       - Standard non-EEA tuition: €4,200 to €7,800/yr (Antwerp is €7,800/yr, VUB is ~€4,200–€5,800/yr, KU Leuven is ~€4,200–€7,000/yr).
+       - Flemish Master Mind Scholarship (VLUHR): Award of €10,225/academic year + full tuition waiver (student pays only ~€139.40 - €145 registration fee). Requirements: 3.5+ CGPA and IELTS 7.0 or high 6.5.
 
-    3. Erasmus Mundus Joint Masters:
+    4. Erasmus Mundus Joint Masters:
        - Full scholarship: 100% tuition waiver + €1,400/month living stipend + insurance + travel allowance.
-       - Programs: IMLEX (XR, Light & Graphics: KU Leuven + UEF + UJM + Toyohashi) and DEAI (Data Engineering & AI at ULB, successor to BDMA whose funding concluded in Oct 2026).
+       - Programs: IMLEX (XR, Light & Graphics: KU Leuven + UEF + UJM + Toyohashi) and DEAI (Data Engineering & AI at ULB).
 
-    4. Financial Solvency (Blocked Account vs. Annex 32):
-       - Legal Basis: Article 60 of Belgian Aliens Act (Office des Étrangers / Dienst Vreemdelingenzaken).
-       - Minimum Living Proof: €803/month (statutory index for 2025/2026/2027) = ~€9,636 to €10,200 per academic year.
-       - Blocked Account: Transferred to university escrow before visa. Transferred BACK to student in monthly allowances of €803 upon arrival. This is LIVING MONEY, NOT tuition!
-       - Annex 32 (Annexe 32 / Bijlage 32): Financial guarantee signed by an EU resident or high-income sponsor earning above ~€2,000–€2,500 net/month after liabilities.
-       - Official scholarship letter above €803/month completely waives the blocked account.
+    5. Belgian Financial Solvency (Blocked Account vs. Annex 32):
+       - Minimum Living Proof: €803/month (Article 60 statutory index) = ~€9,636 to €10,200 per academic year.
+       - Blocked Account: Transferred to university escrow before visa, transferred BACK to student in monthly allowances of €803 upon arrival. LIVING MONEY, NOT tuition!
+       - Annex 32: Financial guarantee signed by an EU resident earning above ~€2,000–€2,500 net/month after liabilities.
 
-    5. Visa D Processing (Pakistan -> Belgium):
-       - Steps: 1) University Admission Letter, 2) HEC attestation + MOFA Apostille on Bachelor degree/transcript, 3) Proof of financial means (Blocked account / Annex 32), 4) Medical certificate by embassy-approved panel doctor, 5) Police character clearance (under 6 months old), 6) Administrative fee payment (~€246–€300 to Belgian Immigration Office), 7) Submission at Gerry's Visa Drop Box / Belgian Embassy Islamabad, 8) Registration at local Belgian town hall (Commune/Gemeente) within 8 days of arrival for Carte A residence permit.
-
-    6. Post-Study Search Year & Work Rights:
-       - 12-month post-study residence permit ('orientation year' / 'zoekjaar') to find employment in Belgium and EU.
-       - 20 hours/week part-time work permitted during studies; full-time during official vacations.
-
-    7. ECTS Credit Hour Conversion:
+    6. ECTS Credit Hour Conversion:
        - 1 Pakistani/US semester credit hour = ~1.8 to 2.0 European ECTS.
-       - 15 credit hours across Calculus, Linear Algebra, Diff Eq, Discrete Math, and Probability/Stats equals 30 ECTS, fully satisfying university quantitative prerequisites!
+       - 15 credit hours across Calculus, Linear Algebra, Diff Eq, Discrete Math, and Probability/Stats equals ~30 ECTS, fully satisfying university quantitative prerequisites!
     `;
 
     let activeContextText = "";
     if (this.activeUniversity) {
-      activeContextText = `\nUSER IS CURRENTLY ASKING ABOUT: ${this.activeUniversity.u} - ${this.activeUniversity.t}. Tailor your response with precise details for this specific program and university!`;
+      activeContextText = `\nUSER IS CURRENTLY ASKING ABOUT: [${this.activeUniversity.country || "Belgium"}] ${this.activeUniversity.u} - ${this.activeUniversity.t}. Tailor your response with precise details for this specific program and university!`;
     }
 
-    return `You are the Senior Academic & Consular Advisor for the Belgium Master's Portal.
-Your job is to provide rigorous, accurate, fact-checked guidance for international students applying to Belgian universities.
+    return `You are the Senior Academic & Consular Advisor for the EuroMasters AI Portal (Belgium & Germany).
+Your job is to provide rigorous, accurate, fact-checked guidance for international students applying to accredited Master's programs across Belgium and Germany.
 
 ${domains}
 
@@ -867,10 +895,10 @@ CRITICAL RESPONSE GUIDELINES (STRICT CONCISENESS & PROPER FORMATTING):
    - Use bold subheadings (### Heading) to divide topics cleanly.
    - Use compact bullet points (- Item) for sequential steps or requirements.
    - ALWAYS use Markdown Tables (| University | Tuition | Deadline |) when comparing numbers, fees, or universities.
-   - Bold key numbers and terms (e.g., **€1,194/year**, **€803/month**, **30 ECTS**).
+   - Bold key numbers and terms (e.g., **€0 tuition**, **€1,194/year**, **€992/month**, **€803/month**, **30 ECTS**).
    - Never output walls of continuous text or giant paragraphs.
 3. BRIEF CITATIONS:
-   - Mention legal basis briefly in parentheses (e.g. *[ARES circular 2026/27]* or *[Aliens Act Art. 60]*). Do not copy-paste long legal statute text.
+   - Mention legal basis or official portal briefly in parentheses (e.g. *[DAAD / uni-assist 2026/27]* or *[ARES circular 2026/27]*).
 4. If asked about fees, clearly separate TUITION from the BLOCKED ACCOUNT living expenses.
 5. If asked about math credits, remind that 15 semester credit hours ≈ 30 ECTS (1 credit ≈ 2 ECTS).`;
   }
@@ -991,7 +1019,7 @@ CRITICAL RESPONSE GUIDELINES (STRICT CONCISENESS & PROPER FORMATTING):
       if (line.includes("|") && i + 1 < lines.length && /^\s*\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/.test(lines[i + 1])) {
         const headerLine = lines[i];
         const headers = headerLine.split("|").map(s => s.trim()).filter((s, idx, arr) => !(idx === 0 && s === "") && !(idx === arr.length - 1 && s === ""));
-        
+
         const rows = [];
         i += 2; // skip header and delimiter lines
 
@@ -1086,14 +1114,14 @@ CRITICAL RESPONSE GUIDELINES (STRICT CONCISENESS & PROPER FORMATTING):
       let pText = line;
       i++;
       while (i < lines.length && lines[i].trim() !== "" &&
-             !lines[i].trim().startsWith("#") &&
-             !lines[i].trim().startsWith("-") &&
-             !lines[i].trim().startsWith("*") &&
-             !lines[i].trim().startsWith("•") &&
-             !/^\d+\.\s+/.test(lines[i].trim()) &&
-             !lines[i].trim().startsWith("&gt;") &&
-             !lines[i].trim().includes("|") &&
-             !lines[i].trim().startsWith("__CODE_BLOCK_")) {
+        !lines[i].trim().startsWith("#") &&
+        !lines[i].trim().startsWith("-") &&
+        !lines[i].trim().startsWith("*") &&
+        !lines[i].trim().startsWith("•") &&
+        !/^\d+\.\s+/.test(lines[i].trim()) &&
+        !lines[i].trim().startsWith("&gt;") &&
+        !lines[i].trim().includes("|") &&
+        !lines[i].trim().startsWith("__CODE_BLOCK_")) {
         pText += " " + lines[i].trim();
         i++;
       }

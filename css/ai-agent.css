@@ -402,6 +402,20 @@
   max-height: 200px;
 }
 
+.ai-mention-group-header {
+  padding: 5px 12px;
+  background-color: var(--bg-subtle);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--bd);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
 .ai-mention-item {
   padding: 9px 12px;
   border-bottom: 1px solid var(--bd);

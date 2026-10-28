@@ -14,53 +14,60 @@ export function generateMarkdownReport(state) {
   const prof = state.profile;
   const ectsMath = creditsToEcts(prof.mathCredits);
 
-  let md = `# Belgium Master's Degree & Visa Strategy Guide (CS, AI & Game Tech)\n\n`;
+  let md = `# EuroMasters Degree & Visa Strategy Guide (Belgium & Germany)\n\n`;
   md += `_Generated on: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}_\n\n`;
 
   md += `## 1. Executive Summary & Strategy\n\n`;
-  md += `This portal guide is designed for international Computer Science and Game Development graduates seeking Master's admissions in Belgium for the **September 2027 intake**.\n\n`;
-  md += `### Three-Tier Application Strategy:\n`;
-  md += `1. **Tier 1 (Safe & Budget): Wallonia-Brussels ARES Exemption (<€1,500/year)**\n`;
+  md += `This report provides a verified, personalized roadmap for Computer Science, AI, and Tech Master's programs across **Germany** and **Belgium** for the upcoming academic intakes.\n\n`;
+  md += `### Dual-Country Strategy Highlights:\n`;
+  md += `1. **Germany: 100% Tuition-Free Public Universities (€0 Tuition)**\n`;
+  md += `   - Public universities across 15 of 16 German federal states charge **€0 statutory tuition** for consecutive Master's degrees.\n`;
+  md += `   - Only a nominal semester contribution (~€85–€350) is charged, which almost universally includes a free public transport transit pass (Semesterticket).\n`;
+  md += `   - Top programs: TUM, RWTH Aachen, Saarland University, University of Bonn, TU Berlin, FAU Erlangen-Nürnberg, University of Passau.\n\n`;
+  md += `2. **Belgium: Wallonia-Brussels ARES Exemption (<€1,500/year)**\n`;
   md += `   - Under the Wallonia-Brussels Higher Education Decree, non-EU students from developing countries (such as Pakistan on the OECD/DAC list) are assimilated into Belgian EU tuition rates.\n`;
   md += `   - **Tuition:** €835 to €1,194/year (2026-27 indexed full rate is €1,194).\n`;
   md += `   - **Universities:** UCLouvain (Louvain-la-Neuve), University of Liège (ULiège), University of Namur (UNamur), and ULB (Brussels).\n\n`;
-  md += `2. **Tier 2 (Reach / Fully Funded): Master Mind & Erasmus Mundus (€0 to €140/yr)**\n`;
-  md += `   - **Flemish Master Mind Scholarship (VLUHR):** €10,225/yr grant + tuition waiver down to ~€139.40/yr. Host university pre-selection deadlines: Jan 15 – April 1.\n`;
-  md += `   - **Erasmus Mundus (IMLEX & DEAI):** 100% tuition waiver + €1,400/month living stipend + insurance + travel grants.\n\n`;
-  md += `3. **Tier 3 (Standard Non-EU Flanders): €4,200 – €7,800/year**\n`;
-  md += `   - University of Antwerp, VUB, KU Leuven, and Ghent University.\n\n`;
+  md += `3. **Full Scholarship Pathways (DAAD, Master Mind & Erasmus Mundus)**\n`;
+  md += `   - **Flemish Master Mind Scholarship (VLUHR):** €10,225/yr grant + tuition waiver down to ~€139.40/yr.\n`;
+  md += `   - **DAAD / Erasmus Mundus:** 100% tuition waiver + €934 to €1,400/month living stipend + health insurance.\n\n`;
 
   md += `## 2. Evaluation Baseline Profile\n\n`;
   md += `- **Degree:** ${prof.degree}\n`;
-  md += `- **CGPA:** ${prof.cgpa} / 4.00 (Exceeds usual 3.0+ minimum; strong contender for scholarship nomination at 3.5+)\n`;
+  md += `- **CGPA:** ${prof.cgpa} / 4.00\n`;
   md += `- **English Language (IELTS):** ${prof.ielts} overall (Lowest sub-band: ${prof.band})\n`;
-  md += `- **GRE Test:** ${prof.gre ? "Completed" : "Not Taken (Waived across all Belgian CS programs)"}\n`;
-  md += `- **Quantitative / Math Background:** ${prof.mathCredits} semester credit hours (~${ectsMath} European ECTS in Calculus, Linear Algebra, Diff Eq, Discrete Math & Probability/Statistics)\n`;
-  md += `- **Portfolio Status:** ${prof.hasPortfolio ? "7 published game titles (Unity, C#, Shader Graph, XR, Multiplayer Networking)" : "None"}\n`;
+  md += `- **German Proficiency:** ${prof.germanLevel || "None (100% English taught programs)"}\n`;
+  md += `- **GRE General Exam:** ${prof.gre ? "Completed / Score Ready" : "Not Taken"}\n`;
+  md += `- **Quantitative / Math Background:** ${prof.mathCredits} semester credit hours (~${ectsMath} European ECTS)\n`;
+  md += `- **Core CS & Engineering:** ${prof.csCredits || 45} semester credit hours (~${creditsToEcts(prof.csCredits || 45)} ECTS)\n`;
+  md += `- **Portfolio Status:** ${prof.hasPortfolio ? "Portfolio Ready (shipped titles/projects)" : "None"}\n`;
   md += `- **Annual Tuition Cap:** €${prof.budget.toLocaleString()} / year\n\n`;
 
   md += `## 3. Comparison Table of Programs (${list.length} programs)\n\n`;
-  md += `| University | Degree Program | Region | Tuition | Profile Fit | Non-EU Deadline |\n`;
+  md += `| Country | University | Degree Program | Tuition | Profile Fit | Non-EU Deadline |\n`;
   md += `| :--- | :--- | :--- | :--- | :--- | :--- |\n`;
 
   list.forEach(p => {
     const fit = calculateFitScore(p, prof);
-    md += `| **${p.u}** (${p.c}) | ${p.t} | ${p.r} | ${p.pill} | ${fit.label} (${fit.score}/100) | ${p.dl || "TBA"} |\n`;
+    md += `| ${p.country || "Belgium"} | **${p.u}** (${p.c}) | ${p.t} | ${p.pill} | ${fit.tierLabel} (${fit.score}%) | ${p.dl || "TBA"} |\n`;
   });
 
   md += `\n## 4. In-Depth Program Details\n\n`;
 
   list.forEach((p, idx) => {
     const fit = calculateFitScore(p, prof);
-    md += `### ${idx + 1}. ${p.u}: ${p.t}\n\n`;
-    md += `- **Institution:** ${p.name} (${p.c}, Belgium)\n`;
+    md += `### ${idx + 1}. [${p.country || "Belgium"}] ${p.u}: ${p.t}\n\n`;
+    md += `- **Institution:** ${p.name} (${p.c}, ${p.country || "Belgium"})\n`;
     md += `- **Tuition Fee:** ${p.tu}\n`;
+    md += `- **Application Route:** ${p.appRoute || "Direct Portal"}\n`;
     md += `- **Application Fee:** ${p.appFee}\n`;
     md += `- **Language of Instruction:** ${p.lang}\n`;
     md += `- **Non-EU Application Deadline:** ${p.dl || "Check official university portal"}\n`;
     md += `- **IELTS Requirement:** ${p.iel} overall ${p.band ? `(minimum ${p.band} each)` : ""}\n`;
-    md += `- **Evaluation Fit Score:** ${fit.label} (${fit.score}/100)\n`;
-    md += `- **Official Website:** [${p.u} Program Link](${p.url})\n\n`;
+    md += `- **Evaluation Fit Score:** ${fit.tierLabel} (${fit.score}% Match)\n`;
+    md += `- **Official Website:** [${p.u} Program Link](${p.url})\n`;
+    if (p.applyUrl) md += `- **Application Portal:** [Direct Apply Link](${p.applyUrl})\n`;
+    md += `\n`;
 
     md += `**Strategic Advantages:**\n`;
     p.why.forEach(w => {
